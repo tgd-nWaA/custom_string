@@ -1,0 +1,8 @@
+# ninja log v5
+5	1221	6878197456288691	src/CMakeFiles/CustomStringCpp_run.dir/Main.cpp.obj	39e17aa09f90f966
+9	1231	6878197456268746	src/CMakeFiles/CustomStringCpp_lib.dir/MyString.cpp.obj	6aa89276b27438b1
+1	1276	6878197456787365	src/CMakeFiles/CustomStringCpp_run.dir/MyString.cpp.obj	36ed0a88a6b6a1a
+18	1285	6878197456827250	test/CMakeFiles/CustomStringCpp_test.dir/MainTest.cpp.obj	c88122db00c3454c
+12	1348	6878197457849591	test/CMakeFiles/CustomStringCpp_test.dir/MyStringTest.cpp.obj	78a3b8e080e3cb45
+1279	1886	6878197462902219	src/CustomStringCpp_run.exe	62c8bfcc3007f980
+1232	2423	6878197468636490	src/CustomStringCpp_lib.lib	5097ebe3655cc7d3

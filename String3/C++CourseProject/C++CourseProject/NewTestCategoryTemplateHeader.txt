@@ -1,0 +1,25 @@
+#include "Test.h"
+#include "String.h"
+
+namespace Testing
+{
+	class classname: public Test
+	{
+	public:
+		classname(void);
+		~classname(void);
+
+	private:
+		void Setup();
+		void Teardown();
+
+	private:
+		//ToDo: Add test specific stuff here.
+		//Tests
+		bool testname();
+
+	private:
+		//Data needed by tests
+		String * m_String;
+	};
+}
