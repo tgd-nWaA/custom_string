@@ -8,11 +8,11 @@ public:
     String(const char);
     String(const char*);
 
-    String(const std::string&); // is constructor necessary?
+    explicit String(const std::string&); // is constructor necessary? is explicit necessary?
 
     String(const String&);  
     //copy-and-swap idiom implemented
-    String& operator=(String other);
+    String& operator=(String other) &;
     String(String&&) noexcept; 
 
     ~String();
@@ -20,7 +20,7 @@ public:
     const char& operator[](const size_t) const;
     char& operator[](const size_t);
     
-    String& operator+=(const String&);
+    String& operator+=(const String&) &; // is it appropriate to make l-value ref-qualified here?
 
     String toLowerCase() const;
     String toUpperCase() const;
@@ -29,35 +29,34 @@ public:
     const char* begin()
     {
         return &this->getC_string()[0];
-    }
+    };
 
     //todo check for safety
     const char* end()
     {
         //[length + 1] as we assign in constructor length without accounting \0
         return &this->getC_string()[length];
-    }
+    };
 
     inline size_t getLength() const
     {
         return length;
-    }
+    };
 
     inline const char* getC_string() const
     {
         return str;
-    }
+    };
 
-    //how does it work?
     explicit inline operator const char* () const
     {
         return str;
-    }
+    };
 
     explicit inline operator std::string() const
     {
-        return std::string(str)
-    }
+        return std::string(str);
+    };
 
 private:
 
@@ -72,12 +71,30 @@ private:
 
 std::ostream& operator<<(std::ostream& _os, const String& _string);
 
-String operator+(const String&, const String&);
+const String operator+(String, const String&);
 
-bool operator == (const String& lstr, const String& rstr);
-bool operator != (const String& lstr, const String& rstr);
-bool operator >= (const String& lstr, const String& rstr);
-bool operator <= (const String& lstr, const String& rstr);
-bool operator >  (const String& lstr, const String& rstr);
-bool operator <  (const String& lstr, const String& rstr);
+inline bool operator == (const String& lstr, const String& rstr) noexcept
+{
+    return strcmp(lstr.getC_string(), rstr.getC_string()) == 0;
+};
+inline bool operator != (const String& lstr, const String& rstr) noexcept
+{
+    return strcmp(lstr.getC_string(), rstr.getC_string()) != 0;
+};
+inline bool operator >= (const String& lstr, const String& rstr) noexcept 
+{
+    return strcmp(lstr.getC_string(), rstr.getC_string()) >= 0;
+};
+bool operator <= (const String& lstr, const String& rstr) noexcept 
+{
+    return strcmp(lstr.getC_string(), rstr.getC_string()) <= 0;
+};
+bool operator >  (const String& lstr, const String& rstr) noexcept
+{
+    return strcmp(lstr.getC_string(), rstr.getC_string()) > 0;
+};
+bool operator <  (const String& lstr, const String& rstr) noexcept
+{
+    return strcmp(lstr.getC_string(), rstr.getC_string()) < 0;
+};
 

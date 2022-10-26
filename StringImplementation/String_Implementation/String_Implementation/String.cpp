@@ -1,4 +1,5 @@
 #include "String.h"
+
 #include <cstring>
 #include <stdexcept>
 #include <iostream>
@@ -30,7 +31,7 @@ String::String(const String& other)
     : String(other.str){}
 
 //implemented copy-and-swap idiom
- String& String::operator=(String other)
+ String& String::operator=(String other) &
  {
      swap(*this, other);
 
@@ -56,9 +57,6 @@ const char& String::operator[](const size_t i) const
     return str[i];
 }
 
-//const char& operator[](const size_t) const;
-//char& operator[](const size_t);
-
 char& String::operator[](const size_t i)
 {
     if (i >= length)
@@ -67,45 +65,30 @@ char& String::operator[](const size_t i)
     return str[i];
 }
 
-//String String::operator+(const String& other) const
-//{
-//    const auto totalLength = length + other.length;
-//    char* buffer = new char[totalLength + 1];
-//
-//    std::copy(str, str + length, buffer);
-//    std::copy(other.str, other.str + other.length, buffer + length);
-//    buffer[totalLength] = '\0';
-//
-//    return String(buffer);
-//}
-
-String& String::operator+=(const String& _other)
+String& String::operator+=(const String& _other) &
 {
-    //dumb
-    if (this != &_other)
-    {
-        auto totalLength = length + _other.length;
-        char* buffer = new char[totalLength + 1];
+    
+    auto totalLength = length + _other.length;
+    char* buffer = new char[totalLength + 1];
 
-        std::copy(str, str + length, buffer);
-        std::copy(_other.str, _other.str + _other.length, buffer + length);
-        buffer[totalLength] = '\0';
+    std::copy(str, str + length, buffer);
+    std::copy(_other.str, _other.str + _other.length, buffer + length);
+    buffer[totalLength] = '\0';
 
-        std::swap(str, buffer);
-        length = totalLength;
+    std::swap(str, buffer);
+    length = totalLength;
 
-        delete[] buffer;
-    }
-
+    delete[] buffer;
+    
     return *this;
 }
-
+    
 String String::toLowerCase() const
 {
     String buffer = *this;
 
     for (auto& c : buffer) {
-        tolower(c);
+        //tolower(c);
     }
 
     return buffer;
@@ -116,7 +99,7 @@ String String::toUpperCase() const
     String buffer = *this;
 
     for (auto& c : buffer) {
-        toupper(c);
+        //toupper(c);
     }
 
     return buffer;
@@ -148,18 +131,10 @@ std::ostream& operator<<(std::ostream& _os, const String& _string)
     return _os;
 }
 
-
-String operator+(const String lhs, const String& rhs)
+const String operator+(String lhs, const String& rhs)
 {
     return lhs += rhs;
 }
-
-bool String::operator==(const String& other) const
-{
-    if (other.c_string() == nullptr) return false;
-    return strcmp(str, other.str) == 0;
-}
-
 
 
 
