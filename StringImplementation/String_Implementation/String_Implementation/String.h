@@ -26,16 +26,15 @@ public:
     String toUpperCase() const;
 
     //todo check for safety
-    const char* begin()
+    inline const char* begin()
     {
         return &this->getC_string()[0];
     };
 
     //todo check for safety
-    const char* end()
+    inline const char* end()
     {
-        //[length + 1] as we assign in constructor length without accounting \0
-        return &this->getC_string()[length];
+        return &this->getC_string()[length + 1];
     };
 
     inline size_t getLength() const
@@ -50,12 +49,12 @@ public:
 
     explicit inline operator const char* () const
     {
-        return str;
+        return getC_string();
     };
 
     explicit inline operator std::string() const
     {
-        return std::string(str);
+        return std::string(getC_string());
     };
 
 private:

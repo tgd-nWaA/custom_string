@@ -47,13 +47,13 @@ String::String(String&& other) noexcept
 String::~String()
 {
     cleanUp();
-}
+};
 
 const char& String::operator[](const size_t i) const
 {
     if (i >= length)
         throw std::out_of_range("Out of bounds!");
-    
+
     return str[i];
 }
 
@@ -61,13 +61,13 @@ char& String::operator[](const size_t i)
 {
     if (i >= length)
         throw std::out_of_range("Out of bounds!");
-    
+
     return str[i];
 }
 
 String& String::operator+=(const String& _other) &
 {
-    
+
     auto totalLength = length + _other.length;
     char* buffer = new char[totalLength + 1];
 
@@ -79,7 +79,7 @@ String& String::operator+=(const String& _other) &
     length = totalLength;
 
     delete[] buffer;
-    
+
     return *this;
 }
     
@@ -88,7 +88,7 @@ String String::toLowerCase() const
     String buffer = *this;
 
     for (auto& c : buffer) {
-        //tolower(c);
+        tolower(c);
     }
 
     return buffer;
@@ -99,7 +99,7 @@ String String::toUpperCase() const
     String buffer = *this;
 
     for (auto& c : buffer) {
-        //toupper(c);
+        toupper(c);
     }
 
     return buffer;
