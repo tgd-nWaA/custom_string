@@ -8,43 +8,34 @@ public:
     String(const char);
     String(const char*);
 
-    String(const String&) ;
+    String(const std::string&); // is constructor necessary?
 
-    //maybe we should make it private and not friend?
-  
-
+    String(const String&);  
+    //copy-and-swap idiom implemented
     String& operator=(String other);
-    //String& operator=(const String&);
-
-    String(String&&) noexcept; //why noexcept here?
+    String(String&&) noexcept; 
 
     ~String();
 
-    const char& operator[](const int) const;
-    char& operator[](const int);
+    const char& operator[](const size_t) const;
+    char& operator[](const size_t);
     
-    String operator+(const String&) const;
     String& operator+=(const String&);
 
     String toLowerCase() const;
     String toUpperCase() const;
 
-    void reset();
-
-    const char* begin(); //should we have const here?
-    const char* end(); // and here?
-
     //todo check for safety
-    const char* String::begin()
+    const char* begin()
     {
-        return &this->c_string()[0];
+        return &this->getC_string()[0];
     }
 
     //todo check for safety
-    const char* String::end()
+    const char* end()
     {
         //[length + 1] as we assign in constructor length without accounting \0
-        return &this->c_string()[length];
+        return &this->getC_string()[length];
     }
 
     inline size_t getLength() const
@@ -52,10 +43,20 @@ public:
         return length;
     }
 
+    inline const char* getC_string() const
+    {
+        return str;
+    }
+
     //how does it work?
     explicit inline operator const char* () const
     {
         return str;
+    }
+
+    explicit inline operator std::string() const
+    {
+        return std::string(str)
     }
 
 private:
@@ -69,6 +70,9 @@ private:
     char* str;
 };
 
+std::ostream& operator<<(std::ostream& _os, const String& _string);
+
+String operator+(const String&, const String&);
 
 bool operator == (const String& lstr, const String& rstr);
 bool operator != (const String& lstr, const String& rstr);
@@ -77,4 +81,3 @@ bool operator <= (const String& lstr, const String& rstr);
 bool operator >  (const String& lstr, const String& rstr);
 bool operator <  (const String& lstr, const String& rstr);
 
-std::ostream& operator<<(std::ostream& _os, const String& _string);

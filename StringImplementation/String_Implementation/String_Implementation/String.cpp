@@ -25,7 +25,7 @@ String::String(const char* other)
     }
 }
 
-//check, not sure how it works
+//check, not sure if and how it works
 String::String(const String& other)
     : String(other.str){}
 
@@ -48,33 +48,36 @@ String::~String()
     cleanUp();
 }
 
-const char& String::operator[](const int i) const
+const char& String::operator[](const size_t i) const
 {
-    if ( i < 0 || i >= length)
+    if (i >= length)
         throw std::out_of_range("Out of bounds!");
     
-    return this->c_string()[i];
+    return str[i];
 }
 
-char& String::operator[](int i)
+//const char& operator[](const size_t) const;
+//char& operator[](const size_t);
+
+char& String::operator[](const size_t i)
 {
-    if (i < 0 || i >= length)
+    if (i >= length)
         throw std::out_of_range("Out of bounds!");
     
-    return this->c_string()[i];
+    return str[i];
 }
 
-String String::operator+(const String& other) const
-{
-    const auto totalLength = length + other.length;
-    char* buffer = new char[totalLength + 1];
-
-    std::copy(str, str + length, buffer);
-    std::copy(other.str, other.str + other.length, buffer + length);
-    buffer[totalLength] = '\0';
-
-    return String(buffer);
-}
+//String String::operator+(const String& other) const
+//{
+//    const auto totalLength = length + other.length;
+//    char* buffer = new char[totalLength + 1];
+//
+//    std::copy(str, str + length, buffer);
+//    std::copy(other.str, other.str + other.length, buffer + length);
+//    buffer[totalLength] = '\0';
+//
+//    return String(buffer);
+//}
 
 String& String::operator+=(const String& _other)
 {
@@ -97,38 +100,27 @@ String& String::operator+=(const String& _other)
     return *this;
 }
 
-std::ostream& operator<<(std::ostream& _os, const String& _string)
-{
-    _os << _string.c_string();
-    return _os;
-}
-
-// use foreach loop
 String String::toLowerCase() const
 {
     String buffer = *this;
 
-    for (int i = 0; i < length; i++) {
-        buffer[i] = tolower(buffer[i]);
+    for (auto& c : buffer) {
+        tolower(c);
     }
 
     return buffer;
 }
 
-// use foreach loop
 String String::toUpperCase() const
 {
     String buffer = *this;
 
-    for (int i = 0; i < length; i++) {
-        buffer[i] = tolower(buffer[i]);
+    for (auto& c : buffer) {
+        toupper(c);
     }
 
     return buffer;
 }
-
-
-
 
 void String::swap(String& first, String& second) // nothrow
 {
@@ -149,11 +141,26 @@ void String::cleanUp()
     length = 0;
 }
 
+
+std::ostream& operator<<(std::ostream& _os, const String& _string)
+{
+    _os << _string.getC_string();
+    return _os;
+}
+
+
+String operator+(const String lhs, const String& rhs)
+{
+    return lhs += rhs;
+}
+
 bool String::operator==(const String& other) const
 {
     if (other.c_string() == nullptr) return false;
     return strcmp(str, other.str) == 0;
 }
+
+
 
 
 
