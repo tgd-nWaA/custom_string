@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <iostream>
 #include <algorithm>
+#include <string>
+#include <fstream>
 
 String::String()
     : length(0), str(nullptr){}
@@ -22,13 +24,15 @@ String::String(const char* other)
     {
         length = strlen(other);
         str = new char[length + 1];
-        std::copy(other, other + length, str);
+        std::copy(other, other + length + 1, str);
     }
 }
 
-//check, not sure if and how it works
+String::String(const std::string& other)
+    : String(other.c_str()) {};
+
 String::String(const String& other)
-    : String(other.str){}
+    : String(other.c_str()) {};
 
 //implemented copy-and-swap idiom
  String& String::operator=(String other) &
@@ -41,6 +45,7 @@ String::String(const String& other)
 String::String(String&& other) noexcept
     : String()
 {
+    std::cout << "moved" << "\n";
     swap(*this, other);
 }
 
@@ -67,7 +72,6 @@ char& String::operator[](const size_t i)
 
 String& String::operator+=(const String& _other) &
 {
-
     auto totalLength = length + _other.length;
     char* buffer = new char[totalLength + 1];
 
@@ -124,10 +128,12 @@ void String::cleanUp()
     length = 0;
 }
 
-
-std::ostream& operator<<(std::ostream& _os, const String& _string)
+std::ostream& operator<<(std::ostream& _os, const String& _string)  
 {
-    _os << _string.getC_string();
+    for (int i = 0; i < _string.getLength(); i++)
+    {
+        _os << _string[i];
+    }
     return _os;
 }
 
