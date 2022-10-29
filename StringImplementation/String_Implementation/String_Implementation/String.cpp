@@ -45,7 +45,6 @@ String::String(const String& other)
 String::String(String&& other) noexcept
     : String()
 {
-    std::cout << "moved" << "\n";
     swap(*this, other);
 }
 
@@ -91,9 +90,8 @@ String String::toLowerCase() const
 {
     String buffer = *this;
 
-    for (auto& c : buffer) {
-        tolower(c);
-    }
+    for (int i = 0; i < buffer.getLength(); i++)
+        buffer[i] = tolower(buffer[i]);
 
     return buffer;
 }
@@ -102,9 +100,8 @@ String String::toUpperCase() const
 {
     String buffer = *this;
 
-    for (auto& c : buffer) {
-        toupper(c);
-    }
+    for (int i = 0; i < buffer.getLength(); i++)
+        buffer[i] = toupper(buffer[i]);
 
     return buffer;
 }
@@ -137,9 +134,9 @@ std::ostream& operator<<(std::ostream& _os, const String& _string)
     return _os;
 }
 
-const String operator+(String lhs, const String& rhs)
+ const String operator+(String lhs, const String& rhs) 
 {
-    return lhs += rhs;
+    return std::move(lhs += rhs);
 }
 
 
