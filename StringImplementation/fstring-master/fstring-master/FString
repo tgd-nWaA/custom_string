@@ -1,0 +1,7 @@
+#ifndef FSTRING
+#define FSTRING
+
+#include <FStringfwd.h>
+#include <FString.h>
+#include <FString.tcc>
+#endif

@@ -7,138 +7,151 @@
 #include <string>
 #include <fstream>
 
-String::String()
-    : length(0), str(nullptr){}
 
-//todo test if it works with length == 1
-String::String(const char _char)
-    : length(1), str(new char[2])
-{
-    str[0] = _char; str[1] = '\0';
-}
 
-String::String(const char* other)
-    : String()
-{
-    if (other != nullptr)
-    {
-        length = strlen(other);
-        str = new char[length + 1];
-        std::copy(other, other + length + 1, str);
-    }
-}
+struct String::StringRep {
 
-String::String(const std::string& other)
-    : String(other.c_str()) {};
+    size_t len;
+    char* alloc;
+    size_t ref_counter;
+    //bool shareable;
 
-String::String(const String& other)
-    : String(other.c_str()) {};
+    StringRep(const char* s = "");
+    StringRep(std::string&);
 
-//implemented copy-and-swap idiom
- String& String::operator=(String other) &
- {
-     swap(*this, other);
+    ~StringRep();
 
-     return *this;
- }
+    //pseudo-copying constructor
+    StringRep* get_own_copy();
+    
+    //pseudo-ajssignment
+    void assign(size_t len,const char*);
 
-String::String(String&& other) noexcept
-    : String()
-{
-    swap(*this, other);
-}
+    StringRep(const StringRep&) = delete;
+    StringRep& operator=(const StringRep&) = delete;
 
-String::~String()
-{
-    cleanUp();
 };
 
-const char& String::operator[](const size_t i) const
-{
-    if (i >= length)
-        throw std::out_of_range("Out of bounds!");
+class Proxy {
 
-    return str[i];
+    friend class String;
+
+private:
+    size_t idx;
+    String& proxyship;
+    Proxy(String&, size_t idx);
+
+public:
+
+    operator char() const;
+    Proxy& operator=(char c);
+};
+
+String::StringRep*
+String::StringRep::get_own_copy() {
+    if (ref_counter == 1) 
+        return this;
+    ref_counter--;
+
+    return new StringRep(len, alloc);
+};
+
+String::Proxy String::operator[](size_t idx) {
+    check(i);
+
+    return Proxy(*this, i);
+};
+
+void String::StringRep::
+    assign(size_t len, const char* s) {
+    if (s == nullptr) {
+        //throw BadString("Not defined pointer") 
+    }
+
+    if (this->len != len) {
+        delete alloc;
+        this->len = len;
+
+        //this->len or len ???
+        alloc = new char[this->len + 1];
+    }
+
+    strcpy(alloc, s);
+};
+
+void String::write(size_t idx, char c) {
+    rep = rep->get_own_copy();
+
+    rep->alloc[i] = c;
 }
 
-char& String::operator[](const size_t i)
+String::StringRep::StringRep(const char* s)
+    : 
+    len(strlen(s)),
+    alloc(new char[len + 1]),
+    ref_counter(1),
+    shareable(true)
 {
-    if (i >= length)
-        throw std::out_of_range("Out of bounds!");
+     std::copy(s, s + len + 1, alloc);
+};
 
-    return str[i];
-}
+String::String()
+    : rep(new StringRep(""){};
 
-String& String::operator+=(const String& _other) &
-{
-    auto totalLength = length + _other.length;
-    char* buffer = new char[totalLength + 1];
+String::String(const char* s)
+    : rep(new StringRep(s)){};
 
-    std::copy(str, str + length, buffer);
-    std::copy(_other.str, _other.str + _other.length, buffer + length);
-    buffer[totalLength] = '\0';
 
-    std::swap(str, buffer);
-    length = totalLength;
+String& String::operator=(const String& s) {
+    s.rep->ref_counter++;
 
-    delete[] buffer;
+    if (--rep->ref_counter == 0)
+        delete rep;
 
+    rep = s.rep;
     return *this;
-}
+};
+
+String::String(const String& s) {
+    s.rep->ref_counter++;
     
-String String::toLowerCase() const
-{
-    String buffer = *this;
+    rep = s.rep;
 
-    for (int i = 0; i < buffer.getLength(); i++)
-        buffer[i] = tolower(buffer[i]);
+};
 
-    return buffer;
-}
+String::~String() {
+    if (rep->ref_counter == 0) {
+        delete rep;
+    }
+};
 
-String String::toUpperCase() const
-{
-    String buffer = *this;
+char& String::operator[](size_t i) {
+    if (rep->ref_counter > 1) {
 
-    for (int i = 0; i < buffer.getLength(); i++)
-        buffer[i] = toupper(buffer[i]);
-
-    return buffer;
-}
-
-void String::swap(String& first, String& second) // nothrow
-{
-    // by swapping the members of two objects,
-    // the two objects are effectively swapped
-    std::swap(first.length, second.length);
-    std::swap(first.str, second.str);
-}
-
-void String::cleanUp()
-{
-    if (str != nullptr)
-    {
-        delete[] str;
-        str = nullptr;
+        --rep->ref_counter;
+        rep = new StringRep(rep->alloc);
     }
 
-    length = 0;
-}
+    rep->shareanble = false;
+    return rep->alloc[i];
+};
 
-std::ostream& operator<<(std::ostream& _os, const String& _string)  
-{
-    for (int i = 0; i < _string.getLength(); i++)
-    {
-        _os << _string[i];
+const char& String::operator[](size_t i) const {
+    if (rep->len <= i) {
+        return rep->alloc[i];
     }
-    return _os;
-}
-
- const String operator+(String lhs, const String& rhs) 
-{
-    return std::move(lhs += rhs);
-}
+};
 
 
+String::Proxy::operator char() const {
 
+    return proxyship.read(idx);
+};
 
+//String::Proxy& String::Proxy
+//operator=(char c) {
+//
+//
+//    proxyship.write(idx, c);
+//    return *this;
+//};

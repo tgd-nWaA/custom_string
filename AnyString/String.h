@@ -1,7 +1,10 @@
 #pragma once
 #include <ostream>
 #include <string>
+#include <memory>
 
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
 class String
 {
 public:
@@ -11,88 +14,59 @@ public:
     String(const char*);
     String(const std::string&);
 
-    String(const String&);  
-    //copy-and-swap idiom implemented
-    String& operator=(String other) &;
-    String(String&&) noexcept; 
+    String(const String&);
 
-    ~String();
+    //String(const String&);
+    ////copy-and-swap idiom implemented
+    //String& operator=(String other)&;
+    //String(String&&) noexcept;
 
-    const char& operator[](const size_t) const;
-    char& operator[](const size_t);
+    ~String(void);
 
-    String& operator+=(const String&) &;
+    String& operator=(const String&);
 
-    String toLowerCase() const;
-    String toUpperCase() const;
+    size_t len() const;
+    bool empty() const;
 
-    inline const char* begin() const 
-    {
-        return &this->c_str()[0];
-    };
+    //support proxy group
+    void check(size_t idx) const;
+    void read(size_t idx) const;
+    void write(size_t idx, char);
 
-    inline const char* end() const
-    {
-        return &this->c_str()[length + 1];
-    };
+    Proxy operator[](size_t idx);
+    const char& operator[](size_t) const;
 
-    inline size_t getLength() const
-    {
-        return length;
-    };
 
-    inline const char* c_str() const
-    {
-        return str;
-    };
-
-    explicit inline operator const char* () const
-    {
-        return c_str();
-    };
-
-    explicit inline operator std::string() const
-    {
-        return std::string(c_str());
-    };
-
+    //String toLowerCase() const;
+    //String toUpperCase() const;
+    //inline const char* begin() const;
+    //inline const char* end() const;
+    //explicit inline operator const char* () const;
+    //explicit inline operator std::string() const;
+    
 private:
 
-    //for copy-and-swap idiom implementation
-    void swap(String&, String&);
-    // deallocating memory and setting pointer and length to 0
-    void cleanUp();
+    struct StringRep;
 
-    size_t length;
-    char* str;
+    std::shared_ptr<StringRep> rep;
+
+    //StringRep* rep;
+
+    class Proxy;
 };
 
-std::ostream& operator<<(std::ostream& _os,const String& _string);
+//std::ostream& operator<<(std::ostream& _os, const String& _string);
+//
+//const String operator+(String, const String&);
+//
+//inline bool operator == (const String& lstr, const String& rstr) noexcept
+//inline bool operator != (const String& lstr, const String& rstr) noexcept
+//inline bool operator >= (const String& lstr, const String& rstr) noexcept
+//inline bool operator <= (const String& lstr, const String& rstr) noexcept
+//inline bool operator >  (const String& lstr, const String& rstr) noexcept
+//inline bool operator <  (const String& lstr, const String& rstr) noexcept
 
-const String operator+(String, const String&);
 
-inline bool operator == (const String& lstr, const String& rstr) noexcept
-{
-    return strcmp(lstr.c_str(), rstr.c_str()) == 0;
-};
-inline bool operator != (const String& lstr, const String& rstr) noexcept
-{
-    return strcmp(lstr.c_str(), rstr.c_str()) != 0;
-};
-inline bool operator >= (const String& lstr, const String& rstr) noexcept 
-{
-    return strcmp(lstr.c_str(), rstr.c_str()) >= 0;
-};
-inline bool operator <= (const String& lstr, const String& rstr) noexcept 
-{
-    return strcmp(lstr.c_str(), rstr.c_str()) <= 0;
-};
-inline bool operator >  (const String& lstr, const String& rstr) noexcept
-{
-    return strcmp(lstr.c_str(), rstr.c_str()) > 0;
-};
-inline bool operator <  (const String& lstr, const String& rstr) noexcept
-{
-    return strcmp(lstr.c_str(), rstr.c_str()) < 0;
-};
+
+
 
