@@ -1,20 +1,26 @@
+#include "foo.h"
 
 #include <iostream>
 
-template <typename T>
-void print(T val);
-
 int main(void) {
+	
+	
+	{
+		String<char> str1("Shmarkli");
+		std::cout << str1 << "\n";
 
-	print(5);
-	print("Hello templates");
-	print(5.907);
+		String<char> str2 = str1;
+
+		str2[3] = 's';
+
+		std::cout << str2 << "\n";
+		
+	}
+
+	{
+		String<wchar_t> str(L"2Shmarkli");
+		std::wcout << str.c_str() << L"\n";
+	}
 
 	return 0;
-};
-
-template <typename T>
-void print(T val) {
-
-	std::cout << val << "\n";
 };

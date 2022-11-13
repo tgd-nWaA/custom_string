@@ -24,6 +24,7 @@
     <ProjectGuid>{52c49a39-d1a5-47d4-ac74-238640015d95}</ProjectGuid>
     <RootNamespace>StringImplementation</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>String</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -129,10 +130,9 @@
   <ItemGroup>
     <ClCompile Include="foo.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="String.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="String.h" />
+    <ClInclude Include="foo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

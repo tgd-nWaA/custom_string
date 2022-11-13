@@ -1,17 +1,12 @@
-//
-// Created by andrey on 02.03.17.
-//
-
-#ifndef LAZY_STRING_H
-#define LAZY_STRING_H
+#pragma once
 
 #include <memory>
 namespace std_utils {
 
-    struct bad_index : std::exception { };
+    struct bad_index : std::exception {};
     template <typename, typename> class lazy_basic_string;
 
-    template <typename T, typename S>
+   /* template <typename T, typename S>
     bool operator==(const T * l, const lazy_basic_string<T, S> & r)
     {
         return (r == l);
@@ -39,7 +34,7 @@ namespace std_utils {
     const lazy_basic_string<T, S> operator+(const T l, const lazy_basic_string<T, S> & r)
     {
         return r.addFromLeft(l);
-    }
+    }*/
 
     template <typename T, typename S>
     void swap(lazy_basic_string<T, S> & l, lazy_basic_string<T, S> & r)
@@ -89,7 +84,7 @@ namespace std_utils {
             clear();
         }
 
-        friend std::ostream & operator<<(std::ostream & os, lazy_basic_string const & str)
+        /*friend std::ostream & operator<<(std::ostream & os, lazy_basic_string const & str)
         {
             return os << str.data_.get();
         }
@@ -97,7 +92,7 @@ namespace std_utils {
         size_t size() const
         {
             return size_;
-        }
+        }*/
 
         bool operator==(const lazy_basic_string & str) const
         {
@@ -356,24 +351,8 @@ namespace std_utils {
         size_t                  size_;
     };
 
-
-    template <typename CharT>
-    struct char_itraits : public std::char_traits<CharT>
-    {
-        static int compare(CharT const * c1, CharT const * c2, size_t n)
-        {
-            for (size_t i = 0; i != n; ++i)
-            {
-                if (std::toupper(c1[i]) < std::toupper(c2[i])) return -1;
-                if (std::toupper(c1[i]) > std::toupper(c2[i])) return 1;
-            }
-            return 0;
-        }
-    };
-
     typedef lazy_basic_string<char>                     lazy_string;
     typedef lazy_basic_string<wchar_t>                  lazy_wstring;
-    typedef lazy_basic_string<char, char_itraits<char>> lazy_istring;
+    
 }
 
-#endif // LAZY_STRING_H
