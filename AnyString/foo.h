@@ -2,14 +2,7 @@
 #include <memory>
 #include <string>
 
-struct bad_index : std::exception { };
-template <typename, typename> class m_basic_string;
-
-template <typename T, typename S>
-void swap(m_basic_string<T, S>& l, m_basic_string<T, S>& r)
-{
-    l.swap(r);
-}
+struct bad_index : std::exception {};
 
 template <typename CharT, typename Traits = std::char_traits<CharT>>
 class m_basic_string {
@@ -39,18 +32,25 @@ public:
         Traits::copy(data_.get(), s.c_str(), len_ + 1);
     }
 
-    //copying constructor
+    //copy constructor
     m_basic_string(const m_basic_string& c)
         : data_(c.data_)
         , len_(c.len_)
     { }
 
-    //copying assignment
-    m_basic_string& operator=(const m_basic_string& c)
+    //implemented copy-and-swap idiom
+    m_basic_string& operator=(m_basic_string other) &
     {
-        data_ = c.data_;
-        len_ = c.len();
+        swap(*this, other);
+
         return *this;
+    }
+
+    //move constructor
+    m_basic_string (m_basic_string&& other) noexcept
+        : m_basic_string()
+    {
+        swap(*this, other);
     }
 
     ~m_basic_string()
@@ -58,55 +58,20 @@ public:
         clear();
     }
 
-    friend std::basic_ostream<CharT, Traits>&
-        operator<<(std::basic_ostream<CharT, Traits>& os, const m_basic_string<CharT>& str) {
-        return os << str.data_.get();
-    }
-
-    /*bool operator==(const m_basic_string& str) const
+    m_basic_string& operator+=(const m_basic_string& str)&
     {
-        if (str.len() != len())
-            return false;
-        if (str.data_ == data_)
-            return true;
-        return (Traits::compare(data_.get(), str.data_.get(), str.len()) == 0);
-    }
+        size_t curr_len = len();
+        size_t add_len = str.len();
+        size_t total_len = curr_len + add_len;
 
-    bool operator==(const CharT* str) const
-    {
-        if (Traits::length(str) != len())
-            return false;
-        else
-            return (Traits::compare(data_.get(), str, len()) == 0);
-    }
+        std::shared_ptr<CharT[]> res(new CharT[total_len + 1]);
+        Traits::copy(res.get(), data_.get(), curr_len);
+        Traits::copy(res.get() + curr_len, str.data_.get(), add_len + 1);
 
-    bool operator<(const m_basic_string& str) const
-    {
-        size_t r = str.len();
-        if (r <= len())
-            return (Traits::compare(data_.get(), str.data_.get(), r) < 0);
-        else
-            return (Traits::compare(data_.get(), str.data_.get(), len()) <= 0);
+        data_ = res;
+        len_ = total_len;
+        return *this;
     }
-
-    bool operator<(const CharT* str) const
-    {
-        size_t r = Traits::length(str);
-        if (r <= len())
-            return (Traits::compare(data_.get(), str, r) < 0);
-        else
-            return (Traits::compare(data_.get(), str, len()) <= 0);
-    }
-
-    bool operator!=(const m_basic_string& str) const
-    {
-        return !operator==(str);
-    }
-
-    bool operator!=(const CharT* str) const
-    {
-        return !operator==(str);
-    }*/
 
     void clear()
     {
@@ -129,158 +94,47 @@ public:
         return len() == 0;
     }
 
-    /*m_basic_string operator+(const CharT* s2) const
-    {
-        size_t length1 = len();
-        size_t length2 = Traits::length(s2);
-        size_t newLength = length1 + length2;
-        std::shared_ptr<CharT> res(new CharT[newLength + 1], array_deleter<CharT>());
-        Traits::copy(res.get(), data_.get(), length1);
-        Traits::copy(res.get() + length1, s2, length2 + 1);
-        m_basic_string result;
-        result.data_ = res;
-        result.len_ = newLength;
-        return result;
-    }
-
-    m_basic_string operator+(const m_basic_string& s2) const
-    {
-        size_t length1 = len();
-        size_t length2 = s2.len();
-        size_t newLength = length1 + length2;
-        std::shared_ptr<CharT> res(new CharT[newLength + 1], array_deleter<CharT>());
-        Traits::copy(res.get(), data_.get(), length1);
-        Traits::copy(res.get() + length1, s2.data_.get(), length2 + 1);
-        m_basic_string result;
-        result.data_ = res;
-        result.len_ = newLength;
-        return result;
-    }
-
-    m_basic_string operator+(const CharT s2) const
-    {
-        size_t length1 = len();
-        size_t length2 = 1;
-        size_t newLength = length1 + length2;
-        std::shared_ptr<CharT> res(new CharT[newLength + 1], array_deleter<CharT>());
-        Traits::copy(res.get(), data_.get(), length1);
-        Traits::copy(res.get() + length1, &s2, length2);
-        Traits::copy(res.get() + newLength, data_.get() + length1, 1);
-        m_basic_string result;
-        result.data_ = res;
-        result.len_ = newLength;
-        return result;
-    }
-
-    m_basic_string addFromLeftStar(const CharT* str) const
-    {
-        size_t currentLength = len();
-        size_t lengthToAdd = Traits::length(str);
-        size_t newLength = currentLength + lengthToAdd;
-        std::shared_ptr<CharT> res(new CharT[newLength + 1], array_deleter<CharT>());
-        Traits::copy(res.get(), str, lengthToAdd);
-        Traits::copy(res.get() + lengthToAdd, data_.get(), currentLength + 1);
-        m_basic_string result;
-        result.data_ = res;
-        result.len_ = newLength;
-        return result;
-    }
-
-    m_basic_string addFromLeft(const CharT str) const
-    {
-        size_t length1 = len();
-        size_t length2 = 1;
-        size_t newLength = length1 + length2;
-        std::shared_ptr<CharT> res(new CharT[newLength + 1], array_deleter<CharT>());
-        Traits::copy(res.get(), &str, length2);
-        Traits::copy(res.get() + length2, data_.get(), length1 + 1);
-        m_basic_string result;
-        result.data_ = res;
-        result.len_ = newLength;
-        return result;
-    }
-
-    m_basic_string& operator+=(const m_basic_string& str)
-    {
-        size_t currentLength = len();
-        size_t lengthToAdd = str.len();
-        size_t newLength = currentLength + lengthToAdd;
-        std::shared_ptr<CharT> res(new CharT[newLength + 1], array_deleter<CharT>());
-        Traits::copy(res.get(), data_.get(), currentLength);
-        Traits::copy(res.get() + currentLength, str.data_.get(), lengthToAdd + 1);
-        data_ = res;
-        len_ = newLength;
-        return *this;
-    }
-
-    m_basic_string& operator+=(const CharT* str)
-    {
-        size_t currentLength = len();
-        size_t lengthToAdd = Traits::length(str);
-        size_t newLength = currentLength + lengthToAdd;
-        std::shared_ptr<CharT> res(new CharT[newLength + 1], array_deleter<CharT>());
-        Traits::copy(res.get(), data_.get(), currentLength);
-        Traits::copy(res.get() + currentLength, str, lengthToAdd + 1);
-        data_ = res;
-        len_ = newLength;
-        return *this;
-    }
-
-    m_basic_string& operator+=(CharT const str)
-    {
-        size_t currentLength = len();
-        size_t newLength = currentLength + 1;
-        std::shared_ptr<CharT> res(new CharT[newLength + 1], array_deleter<CharT>());
-        Traits::copy(res.get(), data_.get(), currentLength + 1);
-        Traits::copy(res.get() + newLength, res.get() + currentLength, 1);
-        Traits::copy(res.get() + currentLength, &str, 1);
-        data_ = res;
-        len_ = newLength;
-        return *this;
-    }*/
-
-
     class Proxy {
     public:
         Proxy(m_basic_string* str_ptr, size_t pos)
-            : str_ptr_(str_ptr)
-            , position_(pos)
+            : str_(str_ptr)
+            , pos_(pos)
         { }
 
         operator CharT()
         {
-            if (position_ > str_ptr_->len())
+            if (pos_ > str_->len())
             {
                 throw bad_index();
             }
             else
-                return *(str_ptr_->data_.get() + position_);
+                return *(str_->data_.get() + pos_);
         }
 
         Proxy operator= (const CharT& value)
         {
-            if (position_ > str_ptr_->len())
+            if (pos_ > str_->len())
             {
                 throw bad_index();
             }
-            if (str_ptr_->data_.use_count() == 1)
+            if (str_->data_.use_count() == 1)
             {
-                *(str_ptr_->data_.get() + position_) = value;
+                *(str_->data_.get() + pos_) = value;
             }
-            if (str_ptr_->data_.use_count() != 1)
+            if (str_->data_.use_count() != 1)
             {
-                size_t n = str_ptr_->len();
-                std::shared_ptr<CharT[]> res(new CharT[n + 1]);
-                Traits::copy(res.get(), str_ptr_->data_.get(), n + 1);
-                *(res.get() + position_) = value;
-                str_ptr_->data_ = res;
+                size_t l = str_->len();
+                std::shared_ptr<CharT[]> res(new CharT[l + 1]);
+                Traits::copy(res.get(), str_->data_.get(), l + 1);
+                *(res.get() + pos_) = value;
+                str_->data_ = res;
             }
             return *this;
         }
 
     private:
-        m_basic_string* str_ptr_;
-        size_t                  position_;
+        m_basic_string*   str_;
+        size_t            pos_;
     };
 
     Proxy operator[](size_t i)
@@ -305,38 +159,66 @@ private:
     }
 
     std::shared_ptr<CharT[]>  data_;
-    size_t                  len_;
+    size_t                    len_;
 };
 
-template <typename T, typename S>
-bool operator==(const T* l, const m_basic_string<T, S>& r)
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+std::basic_ostream<CharT>&
+    operator<<(std::basic_ostream<CharT>& os, const m_basic_string<CharT>& str) {
+    return os << str.c_str();
+}
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+m_basic_string<CharT> operator+(const m_basic_string<CharT> l, const m_basic_string<CharT>& r)
 {
-    return (r == l);
+    return std::move(l += r);
+}
+
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool operator==(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
+{
+       return (Traits::compare(l.c_str(), r.c_str(), l.len()) == 0);
+}
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool operator!=(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
+{
+    return !(l == (r));
+}
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool operator<(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
+{
+    return (Traits::compare(l.c_str(), r.c_str(), l.len()) < 0);
+}
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool operator>(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
+{
+    return !(l<r);
+}
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool operator<=(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
+{
+    return l < r || l==r;
+}
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool operator>=(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
+{
+    return !(l < r) || l==r;
 }
 
 template <typename T, typename S>
-bool operator<(const T* l, const m_basic_string<T, S>& r)
+void swap(m_basic_string<T, S>& l, m_basic_string<T, S>& r)
 {
-    return (!(r < l) && !(r == l));
+    l.swap(r);
 }
 
-template <typename T, typename S>
-bool operator!=(const T* l, const m_basic_string<T, S>& r)
-{
-    return r != l;
-}
-
-template <typename T, typename S>
-const m_basic_string<T, S> operator+(const T* l, const m_basic_string<T, S>& r)
-{
-    return r.addFromLeftStar(l);
-}
-
-template <typename T, typename S>
-const m_basic_string<T, S> operator+(const T l, const m_basic_string<T, S>& r)
-{
-    return r.addFromLeft(l);
-}
-
-typedef m_basic_string<char>                     m_string;
-typedef m_basic_string<wchar_t>                  wm_string;
+using m_string    = m_basic_string<char>;
+using wm_string   = m_basic_string<wchar_t>;
+using u8m_string = m_basic_string<char8_t>;
+using u16m_string = m_basic_string<char16_t>;
+using u32m_string = m_basic_string<char32_t>;
