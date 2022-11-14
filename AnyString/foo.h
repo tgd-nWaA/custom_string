@@ -1,4 +1,6 @@
 
+#define NDEBUG
+
 #include <memory>
 #include <string>
 
@@ -12,14 +14,14 @@ public:
     m_basic_string()
         : data_(nullptr)
         , len_(0)
-    { }
+    {}
 
     //convering constructor for c-style strings
     m_basic_string(CharT const* c)
         : len_(Traits::length(c))
         , data_(nullptr)
     {
-        data_ = std::shared_ptr<CharT[]>(new CharT[len_ + 1]);
+        data_ = std::shared_ptr<CharT>(new CharT[len_ + 1]);
         Traits::copy(data_.get(), c, len_ + 1);
     }
 
@@ -28,7 +30,7 @@ public:
         : len_(s.length())
         , data_(nullptr)
     {
-        data_ = std::shared_ptr<CharT[]>(new CharT[len_ + 1]);
+        data_ = std::shared_ptr<CharT>(new CharT[len_ + 1]);
         Traits::copy(data_.get(), s.c_str(), len_ + 1);
     }
 
@@ -38,7 +40,7 @@ public:
         , len_(c.len_)
     { }
 
-    //implemented copy-and-swap idiom
+    //copy-and-swap implemented 
     m_basic_string& operator=(m_basic_string other) &
     {
         swap(*this, other);
@@ -64,7 +66,7 @@ public:
         size_t add_len = str.len();
         size_t total_len = curr_len + add_len;
 
-        std::shared_ptr<CharT[]> res(new CharT[total_len + 1]);
+        std::shared_ptr<CharT> res(new CharT[total_len + 1]);
         Traits::copy(res.get(), data_.get(), curr_len);
         Traits::copy(res.get() + curr_len, str.data_.get(), add_len + 1);
 
@@ -94,12 +96,13 @@ public:
         return len() == 0;
     }
 
-    class Proxy {
+    class Proxy 
+    {
     public:
         Proxy(m_basic_string* str_ptr, size_t pos)
             : str_(str_ptr)
             , pos_(pos)
-        { }
+        {}
 
         operator CharT()
         {
@@ -124,7 +127,7 @@ public:
             if (str_->data_.use_count() != 1)
             {
                 size_t l = str_->len();
-                std::shared_ptr<CharT[]> res(new CharT[l + 1]);
+                std::shared_ptr<CharT> res(new CharT[l + 1]);
                 Traits::copy(res.get(), str_->data_.get(), l + 1);
                 *(res.get() + pos_) = value;
                 str_->data_ = res;
@@ -158,13 +161,14 @@ private:
         std::swap(len_, r.len_);
     }
 
-    std::shared_ptr<CharT[]>  data_;
-    size_t                    len_;
+    std::shared_ptr<CharT>  data_;
+    size_t                  len_;
 };
 
 template <typename CharT, typename Traits = std::char_traits<CharT>>
 std::basic_ostream<CharT>&
-    operator<<(std::basic_ostream<CharT>& os, const m_basic_string<CharT>& str) {
+    operator<<(std::basic_ostream<CharT>& os, const m_basic_string<CharT>& str)
+{
     return os << str.c_str();
 }
 
@@ -178,7 +182,7 @@ m_basic_string<CharT> operator+(const m_basic_string<CharT> l, const m_basic_str
 template <typename CharT, typename Traits = std::char_traits<CharT>>
 bool operator==(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
 {
-       return (Traits::compare(l.c_str(), r.c_str(), l.len()) == 0);
+    return (Traits::compare(l.c_str(), r.c_str(), l.len()) == 0);
 }
 
 template <typename CharT, typename Traits = std::char_traits<CharT>>
@@ -219,6 +223,6 @@ void swap(m_basic_string<T, S>& l, m_basic_string<T, S>& r)
 
 using m_string    = m_basic_string<char>;
 using wm_string   = m_basic_string<wchar_t>;
-using u8m_string = m_basic_string<char8_t>;
+using u8m_string  = m_basic_string<char8_t>;
 using u16m_string = m_basic_string<char16_t>;
 using u32m_string = m_basic_string<char32_t>;
