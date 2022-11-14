@@ -6,21 +6,21 @@ int main(void) {
 	
 	
 	{
-		String<char> str1("Shmarkli");
-		std::cout << str1 << "\n";
+		m_string foo1("Shmarkli");
+		std::cout << foo1 << "\n";
 
-		String<char> str2 = str1;
-
-		str2[3] = 's';
-
-		std::cout << str2 << "\n";
-		
+		m_string foo2; foo2 = foo1;
 	}
 
 	{
-		String<wchar_t> str(L"2Shmarkli");
-		std::wcout << str.c_str() << L"\n";
+		wm_string str(L"2Shmarkli");
+		std::wcout << str << "\n";
 	}
 
+	{
+		std::wstring foo{L"grjhfkld"};
+		std::wcout << foo << "\n";
+	}
+	
 	return 0;
 };

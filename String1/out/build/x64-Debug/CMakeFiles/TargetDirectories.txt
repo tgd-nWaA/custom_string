@@ -1,9 +1,0 @@
-C:/mystaff/uni/moop/String/String1/out/build/x64-Debug/CMakeFiles/edit_cache.dir
-C:/mystaff/uni/moop/String/String1/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
-C:/mystaff/uni/moop/String/String1/out/build/x64-Debug/src/CMakeFiles/CustomStringCpp_run.dir
-C:/mystaff/uni/moop/String/String1/out/build/x64-Debug/src/CMakeFiles/CustomStringCpp_lib.dir
-C:/mystaff/uni/moop/String/String1/out/build/x64-Debug/src/CMakeFiles/edit_cache.dir
-C:/mystaff/uni/moop/String/String1/out/build/x64-Debug/src/CMakeFiles/rebuild_cache.dir
-C:/mystaff/uni/moop/String/String1/out/build/x64-Debug/test/CMakeFiles/CustomStringCpp_test.dir
-C:/mystaff/uni/moop/String/String1/out/build/x64-Debug/test/CMakeFiles/edit_cache.dir
-C:/mystaff/uni/moop/String/String1/out/build/x64-Debug/test/CMakeFiles/rebuild_cache.dir
