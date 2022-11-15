@@ -1,161 +1,162 @@
-
+﻿
 
 #include "m_string.h"
-void ColorPrint(const char* text, int fg_color, int bg_color);
 
 #include <iostream>
 
-int main(void) {
+const char* res_is = "|>Result is: ";
+const wchar_t* wres_is = L"|>Result is: ";
+
+const char* out_delimeter(char* str);
+
+//work with for each???
+
+int main(void) {	
+
+	{		
+		
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+		m_string foo1;
+		std::cout << res_is << foo1 << "\n";
+	}
 
 	{
-		std::cout << "===================================" << "\n";
-		m_string foo1;
-		std::cout << "Result:" << foo1 << "\n";
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+		wm_string foo1;
+		std::wcout << wres_is << foo1 << "\n";
+	}
+	
+	{
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+		m_string foo1('a');
+		std::cout << res_is << foo1 << "\n";
+	}
+
+	{
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+		
+		m_string foo1("Hallelujah");
+		std::cout << res_is << foo1 << "\n";
+
+		m_string  foo2("GOD");
+		std::cout << res_is << foo2 << "\n";
+
+		const m_string  foo3("Maria");
+		std::cout << res_is << foo3 << "\n";
+	}
+
+	{
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+
+		std::string foo1("Father");
+		m_string foo2(foo1);
+		std::cout << res_is << foo2 << "\n";
+	}
+
+	{
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+
+		m_string foo1("Cappuchino");
+		m_string foo2 = foo1;
+		std::cout << res_is << foo2 << "\n";
+	}
+
+	{
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+
+		m_string foo1("Kratos says:");
+		m_string foo2("\"ragnarok comes\"");
+
+		foo1 += foo2;
+
+		std::cout << res_is << foo1 << "\n";
+	}
+
+	{
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+
+		m_string foo1("bob");
+		m_string foo2(" loves cheeseburgers and women");
+
+		std::cout << res_is << foo1 + foo2 << "\n";
+	}
+
+	{
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+
+		m_string foo1("Kratos says:");
+		m_string foo2("ragnarok comes");
+
+		m_string foo3("bob");
+
+		foo3 = foo1 + foo2;
+		std::cout << res_is << foo3 << "\n";
 	}
 
 	//{
-	//	std::cout << "===================================" << "\n";
-	//	std::cout << "converting constructor with CharT" << "\n" << "\n";
-	//	m_string foo1('a');
-	//	std::cout << foo1 << "\n";
-	//}
+	//	std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
 
-	//{
-	//	std::cout << "===================================" << "\n";
-	//	std::cout << "converting constructors with CharT*" << "\n" << "\n";
-	//	//converting constructor with char*
-	//	m_string foo1("Hallelujah");
-	//	std::cout << foo1 << "\n";
-
-	//	m_string  foo2("GOD");
-	//	std::cout << foo2 << "\n";
-
-	//	const m_string  foo3("Maria");
-	//	std::cout << foo3 << "\n";
-	//}
-
-	//{
-	//	std::cout << "===================================" << "\n";
-	//	std::cout << "converting constructor with std::string" << "\n" << "\n";
-
-	//	std::string foo1("Father");
-	//	m_string foo2(foo1);
-	//	std::cout << foo2 << "\n";
-	//}
-
-	//{
-	//	std::cout << "===================================" << "\n";
-	//	std::cout << "	copying constructor" << "\n" << "\n";
-
-	//	m_string foo1("Cappuchino");
-	//	std::cout << foo1 << "\n";
-	//	m_string foo2(foo1);
-	//	std::cout << foo2 << "\n";
-	//}
-
-	//{
-	//	std::cout << "===================================" << "\n";
-	//	std::cout << "operator =" << "\n" << "\n";
-
-	//	m_string foo1("Cappuchino");
-	//	std::cout << foo1 << "\n";
-	//	m_string foo2 = foo1;
-	//	std::cout << foo2 << "\n";
-	//}
-
-	//{
-	//	std::cout << "===================================" << "\n";
-	//	std::cout << " operator +=" << "\n" << "\n";
-
-	//	m_string foo1("Kratos says:");
-	//	m_string foo2("\"ragnarok comes\"");
-
-	//	foo1 += foo2;
-	//	foo1 += " TODAY comes...either";
-
-	//	std::cout << foo1 << "\n";
-	//}
-
-	//{
-	//	std::cout << "===================================" << "\n";
-	//	std::cout << "operator + " << "\n" << "\n";
-
-	//	m_string foo1("Kratos says:");
-	//	m_string foo2("\"ragnarok comes\"");
-
-	//	m_string foo3("\"bob\"");
-
-	//	std::cout << foo2 + foo1 << "\n";
-	//}
-
-	//{
-	//	std::cout << "===================================" << "\n";
-	//	std::cout << "operator = & operator + " << "\n" << "\n";
-
-	//	m_string foo1("Kratos says:");
-	//	m_string foo2("\"ragnarok comes\"");
-
-	//	m_string foo3("\"bob\"");
-
-	//	foo3 = foo1 + foo2;
-	//	std::cout << foo3 << "\n";
-	//}
-
-	//{
-	//	m_string foo3("\"bob\"");
+	//	m_string foo3("bob");
 
 	//	//TODO
-	//	/*foo3 = "ARFA" + foo3;
-	//	std::cout << foo3 << "\n";*/
+	//	foo3 = "ARFA" + foo3;
+	//	std::cout << foo3 << "\n";
+	//}
+
+	{
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+
+		const m_string foo1("bob");
+
+		std::cout << res_is << foo1[0] << "\n";
+	}
+
+	{
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+		m_string foo1("bob");
+		foo1[0] = 'B';
+
+		std::cout << res_is << foo1[0] << "\n";
+	}
+
+	//{
+	//	std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+	//	m_string foo1("Bob");
+	//	m_string foo2("McNaggets");
+	//	
+	//	foo1 += "is" + foo2;
+
+	//	std::cout << res_is << foo1 << "\n";
 	//}
 
 	//{
-	//	std::cout << "===================================" << "\n";
-	//	std::cout << "	operator []" << "\n" << "\n";
+	//	std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+	//	m_string foo1("BOB");
 
-	//	const m_string foo1("\"bob\"");
-	//	
-	//	
+	//	std::cout << foo1.tolower() << "\n";
+	//	std::cout << foo1.toupper() << "\n";
 
-	//	std::cout << foo1[0] << "\n";
-	//	/*foo1[0] = 'B';
-	//	std::cout << foo1 << "\n";*/
+	//	std::cout << res_is << foo1 << "\n";
+	//}	
 
-	//	/*m_string foo1("\"bob\"");
-	//	foo1[0];
-	//	foo1[0] = 'B';
-	//	std::cout << foo1 << "\n";*/
-	//	
-	//}
 
-	////	std::cout << "===================================" << "\n";
-	////	std::cout << "	operators += and +" << "\n" << "\n";
-	//////operators += and +
-	////strEmpl6 += "is" + strEmpl4;
-	////	std::cout << strEmpl6 << "\n";
+	{
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
 
-	////	std::cout << "===================================" << "\n";
-	////	std::cout << "	lower&upper case" << "\n" << "\n";
-	//////lower&upper case 
-	////std::cout << "\n";
-	////std::cout << strEmpl6.toLowerCase() << "\n";
-	////std::cout << strEmpl6.toUpperCase() << "\n";
+		std::cout << std::boolalpha;
 
-	////std::cout << "===================================" << "\n";
-	////	std::cout << "	equality operators" << "\n" << "\n";
-	//////eq operators
-	////std::cout << std::boolalpha;
-	////String com1("a"); String com2("b");
+		m_string foo1("a");
+		m_string foo2("b");
 
-	////std::cout << (com1 == com2) << "\n";
-	////std::cout << (com1 != com2) << "\n";
-	////std::cout << (com1 >= com2) << "\n";
-	////std::cout << (com1 <= com2) << "\n";
-	////std::cout << (com1 > com2) << "\n";
-	////std::cout << (com1 < com2) << "\n";
-	////std::cout << std::noboolalpha << "\n";
+		std::cout << res_is << (foo1 == foo2) << "\n";
+		std::cout << res_is << (foo1 != foo2) << "\n";
+		std::cout << res_is << (foo1 >= foo2) << "\n";
+		std::cout << res_is << (foo1 <= foo2) << "\n";
+		std::cout << res_is << (foo1 > foo2) << "\n";
+		std::cout << res_is << (foo1 < foo2) << "\n";
 
-	////std::cout << "===================================" << "\n";
+		std::cout << std::noboolalpha;
+	}
 
 	////String s("Tra-ta-ta");
 	////const char* ps = static_cast<const char*> (s);
@@ -163,6 +164,8 @@ int main(void) {
 
 	////ColorPrint("some text", 91, 102);
 	////
+
+	std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
 	return 0;
 }
 
@@ -174,3 +177,6 @@ void ColorPrint(const char* text, int fg_color, int bg_color)
 	std::cout << begin_sequence << fg_color << ';' << bg_color << 'm' << text << reset;
 }
 
+//std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+//std::cout << "|        default constructor m_string       |" << "\n";
+//std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
