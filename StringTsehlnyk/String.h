@@ -177,7 +177,7 @@ inline String::operator const char *() const
     return _container;
 }
 
-inline void String::reserve(size_t n)
+ void String::reserve(size_t n)
 {
     if (n <= _csize)
         return;

@@ -133,9 +133,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="foo.h" />
-    <ClInclude Include="proxy.h" />
-    <ClInclude Include="string_rep.h" />
+    <ClInclude Include="m_string.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
