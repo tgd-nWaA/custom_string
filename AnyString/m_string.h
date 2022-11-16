@@ -10,7 +10,6 @@ template <typename CharT, typename Traits = std::char_traits<CharT>>
 class m_basic_string {
 public:
 
-	//template <typename CharT, typename Traits = std::char_traits<CharT>>
 	class string_rep {
 
 		friend class m_basic_string;
@@ -19,17 +18,15 @@ public:
 		string_rep(void);
 		string_rep(const CharT c);
 		string_rep(const CharT* s);
-		/*string_rep(std::string&);*/
+
+		string_rep(const string_rep&) = delete;
+		string_rep& operator=(const string_rep&) = delete;
 
 		~string_rep();
 
 		//pseudo-copying constructor
-		/*string_rep* get_copy();*/
 		string_rep* get_copy();
 		void assign(size_t len, const CharT* s);
-
-		string_rep(const string_rep&) = delete;
-		string_rep& operator=(const string_rep&) = delete;
 
 		inline size_t use_count() const
 		{return use_count_;};
@@ -38,12 +35,9 @@ public:
 		{return len_;};
 
 		inline CharT* str() const
-		{
-			return str_;
-		};
+		{return str_;};
 
 	private:
-
 		size_t len_;
 		CharT* str_;
 		size_t use_count_;
@@ -51,17 +45,13 @@ public:
 	};
 
 
-	//template <typename CharT, typename Traits = std::char_traits<CharT>>
 	class proxy
 	{
 	public:
-
 		proxy(m_basic_string*, size_t pos);
-
-		inline operator CharT() const;
-
 		inline ~proxy() {};
 
+		inline operator CharT() const;
 		proxy operator= (const CharT& value);
 
 	private:
@@ -69,68 +59,29 @@ public:
 		size_t          pos_;
 	};
 
+	//concatenation 
+	m_basic_string(const CharT* const l, const CharT* const r);
+
 	//converting
 	m_basic_string(void);
 	m_basic_string(const CharT c);
-	m_basic_string(const CharT* s);
+	m_basic_string(const CharT* const s);
 	m_basic_string(std::basic_string<CharT>& s);
 
 	//copy
 	m_basic_string(const m_basic_string& c);
-	m_basic_string& operator=(m_basic_string& s)&;
-
-	//move
-	m_basic_string(m_basic_string&& s) noexcept;
-	m_basic_string& operator=(m_basic_string&& s) noexcept;
+	m_basic_string& operator=(const m_basic_string& s)&;
 
 	~m_basic_string();
 
 	m_basic_string& operator+=(const m_basic_string& s)&;
 
-	//todo correct?
 	proxy operator[](size_t i);
 
 	CharT operator[](size_t i) const;
 
 	m_basic_string tolower() const;
 	m_basic_string touppper() const;
-
-
-	m_basic_string<CharT> operator+(const m_basic_string<CharT>& r) const
-	{
-		return l += r;
-	};
-
-	bool operator==(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
-	{
-		return (Traits::compare(l.c_str(), r.c_str(), l.len()) == 0);
-	};
-
-	bool operator!=(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
-	{
-		return !(l == (r));
-	};
-
-	bool operator<(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
-	{
-		return (Traits::compare(l.c_str(), r.c_str(), l.len()) < 0);
-	};
-
-	bool operator>(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
-	{
-		return !(l < r);
-	};
-
-	bool operator<=(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
-	{
-		return l < r || l == r;
-	};
-
-	bool operator>=(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
-	{
-		return !(l < r) || l == r;
-	};
-
 
 	inline size_t len() const
 	{
@@ -158,33 +109,171 @@ public:
 		return std::basic_string<CharT>(c_str());
 	};
 
-	/*inline const char* begin() const
+	inline const char* begin() const
 	{
 		return &this->c_str()[0];
 	};
 
 	inline const char* end() const
 	{
-		return &this->c_str()[length + 1];
-	};*/
+		return &this->c_str()[len() + 1];
+	};
 
 private:
-	
 	string_rep* rep_;
 };
 
-template <typename CharT, typename Traits = std::char_traits<CharT>>
-std::basic_ostream<CharT>&
-operator<<(std::basic_ostream<CharT>& os, const m_basic_string<CharT>& str)
+template <typename C>
+std::basic_ostream<C>&
+operator<<(std::basic_ostream<C>& os, const m_basic_string<C>& str)
 {
 	return os << str.c_str();
 };
 
-//template <typename T, typename S>
-//void swap_with(m_basic_string<T, S>& l, m_basic_string<T, S>& r)
-//{
-//	l.swap_with(r);
-//}
+template <typename C>
+m_basic_string<C> operator+(m_basic_string<C>& l, const m_basic_string<C>& r)
+{
+	return l += r;
+};
+
+template <typename C, typename TS>
+const m_basic_string<C, TS>
+operator+(const C* const l, const m_basic_string<C, TS>& r)
+{
+	return m_basic_string<C>(l, r.c_str());
+};
+
+template <typename C, typename TS>
+const m_basic_string<C, TS> operator+(const C l, const m_basic_string<C, TS>& r)
+{
+	C* _l = new char[2];
+	_l[0] = l; _l[1] = '\0';
+	return m_basic_string<C>(_l, r.c_str());
+}
+
+template <typename C>
+m_basic_string<C> operator+(m_basic_string<C>& l, const C* const r)
+{
+	return m_basic_string<C>(l.c_str(), r);
+};
+
+template <typename C>
+m_basic_string<C> operator+(m_basic_string<C>& l, const C r)
+{
+	C* _r = new char[2];
+	_r[0] = r; _r[1] = '\0';
+	return m_basic_string<C>(l.c_str(), _r);
+};
+
+template <typename C, typename TS = std::char_traits<C>>
+bool operator==(const m_basic_string<C>& l, const m_basic_string<C>& r)
+{
+	return (TS::compare(l.c_str(), r.c_str(), l.len() + 1) == 0);
+};
+
+//TODO passing &r will break it?
+template <typename C, typename TS = std::char_traits<C>>
+bool operator==(const m_basic_string<C>& l, const C* r)
+{
+	return (TS::compare(l.c_str(), r, l.len() + 1) == 0);
+};
+
+//TODO passing &r will break it?
+template <typename C, typename TS>
+bool operator==(const C* l, const m_basic_string<C, TS>& r)
+{
+	return (r == l);
+};
+
+template <typename C>
+bool operator!=(const m_basic_string<C>& l, const m_basic_string<C>& r)
+{
+	return !(l == (r));
+};
+
+template <typename C, typename TS>
+bool operator!=(const m_basic_string<C, TS>& l, const C* r)
+{
+	return !(l == (r));
+}
+
+template <typename C, typename TS>
+bool operator!=(const C* l, const m_basic_string<C, TS>& r)
+{
+	return r != l;
+}
+
+template <typename C, typename TS = std::char_traits<C>>
+bool operator<(const m_basic_string<C>& l, const m_basic_string<C>& r)
+{
+	return (TS::compare(l.c_str(), r.c_str(), l.len() + 1) < 0);
+};
+
+template <typename C, typename TS>
+bool operator<(const C* l, const m_basic_string<C, TS>& r)
+{
+	return (TS::compare(l, r.c_str(), r.len() + 1) < 0);
+}
+
+template <typename C, typename TS>
+bool operator<(const m_basic_string<C, TS>& l,const C* r)
+{
+	return (!(r < l) && !(r == l));
+}
+
+template <typename C>
+bool operator>(const m_basic_string<C>& l, const m_basic_string<C>& r)
+{
+	return !(l < r);
+};
+
+template <typename C, typename TS>
+bool operator>(const C* l, const m_basic_string<C, TS>& r)
+{
+	return !(l < r);
+}
+
+template <typename C, typename TS>
+bool operator>(const m_basic_string<C, TS>& l, const C* r)
+{
+	return !(l < r);
+}
+
+template <typename C>
+bool operator<=(const m_basic_string<C>& l, const m_basic_string<C>& r)
+{
+	return l < r || l == r;
+};
+
+template <typename C, typename TS>
+bool operator<=(const C* l, const m_basic_string<C, TS>& r)
+{
+	return l < r || l == r;
+}
+
+template <typename C, typename TS>
+bool operator<=(const m_basic_string<C, TS>& l, const C* r)
+{
+	return l < r || l == r;
+}
+
+template <typename C>
+bool operator>=(const m_basic_string<C>& l, const m_basic_string<C>& r)
+{
+	return !(l < r) || l == r;
+};
+
+template <typename C, typename TS>
+bool operator>=(const C* l, const m_basic_string<C, TS>& r)
+{
+	return !(l < r) || l == r;
+}
+
+template <typename C, typename TS>
+bool operator>=(const m_basic_string<C, TS>& l, const C* r)
+{
+	return !(l < r) || l == r;
+}
 
 using m_string = m_basic_string<char>;
 using wm_string = m_basic_string<wchar_t>;
@@ -194,6 +283,23 @@ using u32m_string = m_basic_string<char32_t>;
 /*
 *	m_basic_string
 */
+
+template <typename CharT, typename Traits>
+m_basic_string<CharT, Traits>::
+m_basic_string(const CharT* const l, const CharT* const r)
+	: rep_(new string_rep())
+{
+	size_t l_len = Traits::length(l);
+	size_t r_len = Traits::length(r);
+	size_t total_len = l_len + r_len;
+
+	CharT* res = new CharT[total_len + 1];
+	Traits::copy(res, l, l_len);
+	Traits::copy(res + l_len, r, r_len + 1);
+
+	delete rep_;
+	rep_ = new string_rep(res);
+};
 
 //default constructor
 template <typename CharT, typename Traits>
@@ -229,7 +335,7 @@ m_basic_string<CharT, Traits>::~m_basic_string()
 
 //converting constructor for c-style strings 
 template <typename CharT, typename Traits>
-m_basic_string<CharT, Traits>::m_basic_string(const CharT* s)
+m_basic_string<CharT, Traits>::m_basic_string(const CharT* const s)
 	: rep_(new string_rep(s))
 {
 	#ifndef NDEBUG
@@ -264,7 +370,7 @@ m_basic_string(const m_basic_string& c)
 template <typename CharT, typename Traits>
 m_basic_string<CharT, Traits>&
 m_basic_string<CharT, Traits>::
-operator=(m_basic_string& s)&
+operator=(const m_basic_string& s)&
 {
 	++s.rep_->use_count_;
 
@@ -277,38 +383,6 @@ operator=(m_basic_string& s)&
 
 	#ifndef NDEBUG
 	std::cout << "copy assignment" << "\n";
-	#endif    
-};
-
-//move constructor
-template <typename CharT, typename Traits>
-m_basic_string<CharT, Traits>::
-m_basic_string(m_basic_string&& s) noexcept
-	: m_basic_string()
-{
-	std::swap(rep_, s.rep_);
-#ifndef NDEBUG
-	std::cout << "move constructor" << "\n";
-#endif    
-};
-
-//move assignment
-template <typename CharT, typename Traits>
-m_basic_string<CharT, Traits>&
-m_basic_string<CharT, Traits>::
-operator=(m_basic_string&& s) noexcept
-{
-	++s.rep_->use_count_;
-
-	if (--rep_->use_count_ == 0)
-		delete rep_;
-
-	rep_ = s.rep_;
-
-	return *this;
-
-	#ifndef NDEBUG
-	std::cout << "move assignment" << "\n";
 	#endif    
 };
 
@@ -376,7 +450,7 @@ tolower() const
 	size_t len = rep_->len();
 	CharT* buffer = new CharT[len + 1];
 
-	for (int i = 0; i < len; i++)
+	for (int i = 0; i < len + 1; i++)
 		buffer[i] = std::tolower(rep_->str_[i]);
 
 	return m_basic_string(buffer);
@@ -390,12 +464,11 @@ touppper() const
 	size_t len = rep_->len();
 	CharT* buffer = new CharT[len + 1];
 
-	for (int i = 0; i < len; i++)
+	for (int i = 0; i < len + 1; i++)
 		buffer[i] = std::toupper(rep_->str_[i]);
 
 	return m_basic_string(buffer);
 }
-
 
 
 /*
