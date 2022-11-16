@@ -93,16 +93,6 @@ int main(void) {
 		std::cout << res_is << foo3 << "\n";
 	}
 
-	//{
-	//	std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
-
-	//	m_string foo3("bob");
-
-	//	//TODO
-	//	foo3 = "ARFA" + foo3;
-	//	std::cout << foo3 << "\n";
-	//}
-
 	{
 		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
 
@@ -119,25 +109,26 @@ int main(void) {
 		std::cout << res_is << foo1[0] << "\n";
 	}
 
-	//{
-	//	std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
-	//	m_string foo1("Bob");
-	//	m_string foo2("McNaggets");
-	//	
-	//	foo1 += "is" + foo2;
+	{
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+		m_string foo1("Bob");
+		m_basic_string<char> foo2("McNaggets");
+		
+		foo1 += " loves " + foo2;
+		foo1 += foo2 + "love";
 
-	//	std::cout << res_is << foo1 << "\n";
-	//}
+		std::cout << res_is << foo1 << "\n";
+	}
 
-	//{
-	//	std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
-	//	m_string foo1("BOB");
+	{
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+		m_string foo1("BOB");
 
-	//	std::cout << foo1.tolower() << "\n";
-	//	std::cout << foo1.toupper() << "\n";
+		std::cout << foo1.tolower() << "\n";
+		std::cout << foo1.touppper() << "\n";
 
-	//	std::cout << res_is << foo1 << "\n";
-	//}	
+		std::cout << res_is << foo1 << "\n";
+	}	
 
 
 	{
@@ -158,9 +149,14 @@ int main(void) {
 		std::cout << std::noboolalpha;
 	}
 
-	////String s("Tra-ta-ta");
-	////const char* ps = static_cast<const char*> (s);
-	////std::cout << (s += ps) << ';' << std::endl;
+	{
+		std::cout << "| - - - - - - - - - - - - - - - - - - - - - |" << "\n";
+		m_string s("Tra-ta-ta");
+		const char* ps = static_cast<const char*> (s);
+		std::cout << (s += ps) << ';' << std::endl;
+	}
+
+	
 
 	////ColorPrint("some text", 91, 102);
 	////

@@ -92,6 +92,46 @@ public:
 
 	CharT operator[](size_t i) const;
 
+	m_basic_string tolower() const;
+	m_basic_string touppper() const;
+
+
+	m_basic_string<CharT> operator+(const m_basic_string<CharT>& r) const
+	{
+		return l += r;
+	};
+
+	bool operator==(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
+	{
+		return (Traits::compare(l.c_str(), r.c_str(), l.len()) == 0);
+	};
+
+	bool operator!=(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
+	{
+		return !(l == (r));
+	};
+
+	bool operator<(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
+	{
+		return (Traits::compare(l.c_str(), r.c_str(), l.len()) < 0);
+	};
+
+	bool operator>(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
+	{
+		return !(l < r);
+	};
+
+	bool operator<=(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
+	{
+		return l < r || l == r;
+	};
+
+	bool operator>=(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
+	{
+		return !(l < r) || l == r;
+	};
+
+
 	inline size_t len() const
 	{
 		return rep_->len();
@@ -140,53 +180,11 @@ operator<<(std::basic_ostream<CharT>& os, const m_basic_string<CharT>& str)
 	return os << str.c_str();
 };
 
-template <typename CharT, typename Traits = std::char_traits<CharT>>
-m_basic_string<CharT> operator+(m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
-{
-	return l += r;
-};
-
-template <typename CharT, typename Traits = std::char_traits<CharT>>
-bool operator==(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
-{
-	return (Traits::compare(l.c_str(), r.c_str(), l.len()) == 0);
-};
-
-template <typename CharT, typename Traits = std::char_traits<CharT>>
-bool operator!=(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
-{
-	return !(l == (r));
-};
-
-template <typename CharT, typename Traits = std::char_traits<CharT>>
-bool operator<(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
-{
-	return (Traits::compare(l.c_str(), r.c_str(), l.len()) < 0);
-};
-
-template <typename CharT, typename Traits = std::char_traits<CharT>>
-bool operator>(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
-{
-	return !(l < r);
-};
-
-template <typename CharT, typename Traits = std::char_traits<CharT>>
-bool operator<=(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
-{
-	return l < r || l == r;
-};
-
-template <typename CharT, typename Traits = std::char_traits<CharT>>
-bool operator>=(const m_basic_string<CharT>& l, const m_basic_string<CharT>& r)
-{
-	return !(l < r) || l == r;
-};
-
-template <typename T, typename S>
-void swap_with(m_basic_string<T, S>& l, m_basic_string<T, S>& r)
-{
-	l.swap_with(r);
-}
+//template <typename T, typename S>
+//void swap_with(m_basic_string<T, S>& l, m_basic_string<T, S>& r)
+//{
+//	l.swap_with(r);
+//}
 
 using m_string = m_basic_string<char>;
 using wm_string = m_basic_string<wchar_t>;
@@ -369,6 +367,35 @@ operator[](size_t i) const
 	std::cout << "move assignment" << "\n";
 	#endif    
 };
+
+template <typename CharT, typename Traits>
+m_basic_string<CharT, Traits>
+m_basic_string<CharT, Traits>::
+tolower() const
+{
+	size_t len = rep_->len();
+	CharT* buffer = new CharT[len + 1];
+
+	for (int i = 0; i < len; i++)
+		buffer[i] = std::tolower(rep_->str_[i]);
+
+	return m_basic_string(buffer);
+}
+
+template <typename CharT, typename Traits>
+m_basic_string<CharT, Traits>
+m_basic_string<CharT, Traits>::
+touppper() const
+{
+	size_t len = rep_->len();
+	CharT* buffer = new CharT[len + 1];
+
+	for (int i = 0; i < len; i++)
+		buffer[i] = std::toupper(rep_->str_[i]);
+
+	return m_basic_string(buffer);
+}
+
 
 
 /*
