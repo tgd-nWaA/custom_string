@@ -3,25 +3,20 @@
 
 #include <string>
 
+class Color;
+
 class bad_index : std::exception {};
 class bad_pointer : std::exception {};
-
-
-class color;
 
 template <typename CharT, typename Traits = std::char_traits<CharT>>
 class m_basic_string {
 public:
 
 	class string_rep {
-
 		friend class m_basic_string;
-		
-
 	public:
 		string_rep(void);
-		string_rep(const CharT c);
-		
+		string_rep(const CharT c);	
 		string_rep(size_t len, const CharT* s);
 
 		string_rep(const string_rep&) = delete;
@@ -33,8 +28,7 @@ public:
 
 		//pseudo-copying constructor
 		string_rep* get_own_copy();
-
-		//	pseudo assignment
+		//pseudo assignment
 		void assign(size_t len, const CharT* s);
 
 		inline size_t use_count() const
@@ -52,26 +46,28 @@ public:
 			return str_;
 		};
 
+		inline const Color& color() const {
+			return color_;
+		};
+
 	private:
 
 		size_t len_;
 		CharT* str_;
 		size_t use_count_;
-		/*bool shareable_;*/
 
-		color& color_;
-
+		Color& color_;
 	};
 
-	class proxy
+	class Proxy
 	{
 		friend class m_basic_string;
 	public:
-		proxy(m_basic_string& s, size_t pos);
-		~proxy() = default;
+		Proxy(m_basic_string& s, size_t pos);
+		~Proxy() = default;
 		
 		inline operator CharT() const;
-		proxy& operator= (const CharT value);
+		Proxy& operator= (const CharT value);
 
 	private:
 		m_basic_string&       b_str_;
@@ -96,7 +92,7 @@ public:
 
 	m_basic_string& operator+=(const m_basic_string& s)&;
 
-	proxy operator[](size_t i);
+	Proxy operator[](size_t i);
 
 	CharT operator[](size_t i) const;
 
@@ -115,8 +111,8 @@ public:
 		return rep_->len();
 	};
 
-	inline const color& get_color() const {
-		return rep_->color_;
+	inline const Color& color() const {
+		return rep_->color();
 	}
 
 	inline const CharT* c_str() const
@@ -154,7 +150,7 @@ private:
 	string_rep* rep_;
 };
 
-class color {
+class Color {
 	template <typename CharT, typename Traits>
 	friend class m_basic_string<CharT, Traits>::string_rep;
 private:
@@ -175,25 +171,25 @@ public:
 		return b_;
 	};
 
-	color(
+	Color(
 		size_t,
 		size_t,
 		size_t);
-	~color() = default;
+	~Color() = default;
 };
 
 template <typename CharT>
 std::basic_ostream<CharT>&
 operator<<(std::basic_ostream<CharT>& os, const m_basic_string<CharT>& str)
 { 
-	color color = str.get_color();
+	Color Color = str.color();
 	
 	return os 
-		<< color::rgb_sequence 
-		<< std::to_string(color.get_r()) << ';' 
-		<< std::to_string(color.get_g()) << ';' 
-		<< std::to_string(color.get_b()) << 'm' 
-		<< str.c_str() << color::reset;
+		<< Color::rgb_sequence 
+		<< std::to_string(Color.get_r()) << ';' 
+		<< std::to_string(Color.get_g()) << ';' 
+		<< std::to_string(Color.get_b()) << 'm' 
+		<< str.c_str() << Color::reset;
 };
 
 template <typename C>
@@ -452,12 +448,12 @@ operator+=(const m_basic_string& s)&
 
 //modifier[]
 template <typename CharT, typename Traits>
-typename m_basic_string<CharT, Traits>::proxy
+typename m_basic_string<CharT, Traits>::Proxy
 m_basic_string<CharT, Traits>::
 operator[](size_t i)
 {
 	check(i);
-	return proxy(*this, i);
+	return Proxy(*this, i);
 };
 
 //selector[]
@@ -514,39 +510,36 @@ touppper() const
 *	string_rep
 */
 
-//default constructor
 template <typename CharT, typename Traits>
 m_basic_string<CharT, Traits>::
 string_rep::string_rep(void)
 	: len_(0)
 	, str_(new CharT[1])
 	, use_count_(1)
-	, color_(*(new color(192, 192, 192)))
+	, color_(*(new Color(192, 192, 192)))
 {
 	*str_ = '\0';
 };
 
-//converting constructor for CharT
 template <typename CharT, typename Traits>
 m_basic_string<CharT, Traits>::
 string_rep::string_rep(const CharT c)
 	: len_(1)
 	, str_(new CharT[2])
 	, use_count_(1)
-	, color_(*(new color(192, 192, 192)))
+	, color_(*(new Color(192, 192, 192)))
 {
 	*str_ = c;
 	*(str_ + 1) = '\0';
 };
 
-//converting constructor for c-style strings
 template <typename CharT, typename Traits>
 m_basic_string<CharT, Traits>::
 string_rep::string_rep(size_t len, const CharT* s)
 	: len_(len)
 	, str_(new CharT[len_ + 1])
 	, use_count_(1)
-	, color_(*(new color(192, 192, 192)))
+	, color_(*(new Color(192, 192, 192)))
 {
 	Traits::copy(str_, s, len_ + 1);
 };
@@ -563,23 +556,23 @@ string_rep::~string_rep()
 */
 
 template <typename CharT, typename Traits>
-m_basic_string<CharT, Traits>::proxy::
-proxy(m_basic_string& s, size_t pos)
+m_basic_string<CharT, Traits>::Proxy::
+Proxy(m_basic_string& s, size_t pos)
 	: b_str_(s)
 	, pos_(pos)
 {};
 
 template <typename CharT, typename Traits>
-inline m_basic_string<CharT, Traits>::proxy::
+inline m_basic_string<CharT, Traits>::Proxy::
 operator CharT() const
 {
 	return b_str_.read(pos_);
 };
 
 template <typename CharT, typename Traits>
-typename m_basic_string<CharT, Traits>::proxy&
+typename m_basic_string<CharT, Traits>::Proxy&
 m_basic_string<CharT, Traits>::
-proxy::operator=(const CharT c)
+Proxy::operator=(const CharT c)
 {
 	b_str_.write(pos_, c);
 	return *this;
@@ -666,7 +659,7 @@ colorize(unsigned __int8 r, unsigned __int8 g, unsigned __int8 b) {
 	color_.b_ = b;
 };
 
-color::color(
+Color::Color(
 	size_t r,
 	size_t g,
 	size_t b)

@@ -10,30 +10,10 @@ const wchar_t* wres_is = L"|>Result is: ";
 
 size_t delim_count = 0;
 
-//void ColorPrint(const char* text, int fg_color, int bg_color);
-//std::ostream& bold_off(std::ostream& os);
-//std::ostream& bold_on(std::ostream& os);
 std::ostream& highlight(std::ostream& os);
 std::string delimeter(const char* str);
 
-
-
-//work with for each???
-
 int main(void) {
-
-	{
-		
-		m_string foo1 = foo1;
-
-		foo1 = foo1;	
-	}
-
-	{
-		std::cout << delimeter("pre");
-		std::string foo1 = foo1;
-		std::cout << res_is << foo1;
-	}
 
 	{		
 		std::cout << delimeter("default ");
@@ -54,7 +34,6 @@ int main(void) {
 		std::cout << res_is << foo1 << "\n";
 
 		m_string  foo2("GOD");
-		foo2.colorize(123, 236, 87);
 		std::cout << res_is << foo2 << "\n";
 
 		const m_string  foo3("Maria");
