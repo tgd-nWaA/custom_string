@@ -96,6 +96,8 @@ int main(void) {
 		const m_string foo1("bob");
 		m_string foo2("marli");
 
+		foo2.colorize(23, 100,33);
+
 		std::cout << res_is << foo1[0] << "\n";
 		std::cout << res_is << foo2[0] << "\n";
 		foo2[0] = 'B';

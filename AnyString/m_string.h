@@ -3,6 +3,9 @@
 
 #include <string>
 
+//TODO
+#include <iostream>
+
 class Color;
 
 class bad_index : std::exception {};
@@ -62,9 +65,22 @@ public:
 	class Proxy
 	{
 		friend class m_basic_string;
+		
+		friend std::basic_ostream<CharT>&
+			operator<<(std::basic_ostream<CharT>& os, const typename m_basic_string<CharT>::Proxy& proxy)
+		{
+			Color color = proxy.b_str_.color();
+			
+			return os << Color::rgb_sequence
+				<< std::to_string(color.get_r()) << ';'
+				<< std::to_string(color.get_g()) << ';'
+				<< std::to_string(color.get_b()) << 'm'
+				<< proxy.b_str_.c_str()[proxy.pos_] << Color::reset;
+		};
+		
 	public:
 		Proxy(m_basic_string& s, size_t pos);
-		~Proxy() = default;
+		~Proxy() = default;	
 		
 		inline operator CharT() const;
 		Proxy& operator= (const CharT value);
@@ -101,6 +117,8 @@ public:
 	CharT read(size_t i) const;
 
 	void colorize(unsigned __int8, unsigned __int8, unsigned __int8);
+	void make_italic();
+	void make_bold();
 
 	m_basic_string tolower() const;
 	m_basic_string touppper() const;
@@ -182,13 +200,13 @@ template <typename CharT>
 std::basic_ostream<CharT>&
 operator<<(std::basic_ostream<CharT>& os, const m_basic_string<CharT>& str)
 { 
-	Color Color = str.color();
+	Color color = str.color();
 	
 	return os 
 		<< Color::rgb_sequence 
-		<< std::to_string(Color.get_r()) << ';' 
-		<< std::to_string(Color.get_g()) << ';' 
-		<< std::to_string(Color.get_b()) << 'm' 
+		<< std::to_string(color.get_r()) << ';' 
+		<< std::to_string(color.get_g()) << ';' 
+		<< std::to_string(color.get_b()) << 'm' 
 		<< str.c_str() << Color::reset;
 };
 
@@ -665,3 +683,4 @@ Color::Color(
 	size_t b)
 	: r_(r), g_(g), b_(b)
 {};
+
