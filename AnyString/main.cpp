@@ -46,6 +46,7 @@ int main(void) {
 
 		std::string foo1("Father");
 		m_string foo2(foo1);
+		foo2.colorize(13, 25, 180);
 		std::cout << res_is << foo2 << "\n";
 	}
 
