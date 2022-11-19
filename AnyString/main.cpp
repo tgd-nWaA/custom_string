@@ -54,6 +54,7 @@ int main(void) {
 		std::cout << res_is << foo1 << "\n";
 
 		m_string  foo2("GOD");
+		foo2.colorize(123, 236, 87);
 		std::cout << res_is << foo2 << "\n";
 
 		const m_string  foo3("Maria");

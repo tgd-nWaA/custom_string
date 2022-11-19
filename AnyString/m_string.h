@@ -6,32 +6,8 @@
 class bad_index : std::exception {};
 class bad_pointer : std::exception {};
 
-class color {
-	friend class string_rep;
-private:
-	unsigned __int8 r_;
-	unsigned __int8 g_;
-	unsigned __int8 b_;
-public:
-	static constexpr char rgb_sequence[]{ 0x1B,'[','3','8',';','5',';','\0' };
-	static constexpr char reset[]{ 0x1B,'[','0','m','\0' };
 
-	inline unsigned __int8 get_r() const{
-		return r_;
-	};
-	inline unsigned __int8 get_g() const {
-		return g_;
-	};
-	inline unsigned __int8 get_b() const {
-		return b_;
-	};
-
-	color(
-		unsigned __int8,
-		unsigned __int8,
-		unsigned __int8);
-	~color() = default;
-};
+class color;
 
 template <typename CharT, typename Traits = std::char_traits<CharT>>
 class m_basic_string {
@@ -178,13 +154,46 @@ private:
 	string_rep* rep_;
 };
 
+class color {
+	template <typename CharT, typename Traits>
+	friend class m_basic_string<CharT, Traits>::string_rep;
+private:
+	unsigned __int8 r_;
+	unsigned __int8 g_;
+	unsigned __int8 b_;
+public:
+	static constexpr char rgb_sequence[]{ 0x1B,'[','3','8',';','2',';','\0' };
+	static constexpr char reset[]{ 0x1B,'[','0','m','\0' };
+
+	inline size_t get_r() const {
+		return r_;
+	};
+	inline size_t get_g() const {
+		return g_;
+	};
+	inline size_t get_b() const {
+		return b_;
+	};
+
+	color(
+		size_t,
+		size_t,
+		size_t);
+	~color() = default;
+};
+
 template <typename CharT>
 std::basic_ostream<CharT>&
 operator<<(std::basic_ostream<CharT>& os, const m_basic_string<CharT>& str)
 { 
+	color color = str.get_color();
 	
-	return os << color::rgb_sequence << str.get_color().get_r() << ';' << str.get_color().get_g() << ';' << str.get_color().get_b() << 'm' << '\0' << color::reset;
-		
+	return os 
+		<< color::rgb_sequence 
+		<< std::to_string(color.get_r()) << ';' 
+		<< std::to_string(color.get_g()) << ';' 
+		<< std::to_string(color.get_b()) << 'm' 
+		<< str.c_str() << color::reset;
 };
 
 template <typename C>
@@ -644,6 +653,7 @@ colorize(
 	unsigned __int8 g,
 	unsigned __int8 b) {
 	
+	rep_ = rep_->get_own_copy();
 	rep_->colorize(r, g, b);
 }
 
@@ -651,17 +661,14 @@ template <typename CharT, typename Traits>
 void m_basic_string<CharT, Traits>::
 string_rep::
 colorize(unsigned __int8 r, unsigned __int8 g, unsigned __int8 b) {
-	
-		rep_ = rep_->get_own_copy();
-	
 	color_.r_ = r;
 	color_.g_ = g;
 	color_.b_ = b;
 };
 
 color::color(
-	unsigned __int8 r,
-	unsigned __int8 g,
-	unsigned __int8 b)
+	size_t r,
+	size_t g,
+	size_t b)
 	: r_(r), g_(g), b_(b)
 {};
