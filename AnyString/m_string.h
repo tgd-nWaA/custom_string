@@ -6,6 +6,33 @@
 class bad_index : std::exception {};
 class bad_pointer : std::exception {};
 
+class color {
+	friend class string_rep;
+private:
+	unsigned __int8 r_;
+	unsigned __int8 g_;
+	unsigned __int8 b_;
+public:
+	static constexpr char rgb_sequence[]{ 0x1B,'[','3','8',';','5',';','\0' };
+	static constexpr char reset[]{ 0x1B,'[','0','m','\0' };
+
+	inline unsigned __int8 get_r() const{
+		return r_;
+	};
+	inline unsigned __int8 get_g() const {
+		return g_;
+	};
+	inline unsigned __int8 get_b() const {
+		return b_;
+	};
+
+	color(
+		unsigned __int8,
+		unsigned __int8,
+		unsigned __int8);
+	~color() = default;
+};
+
 template <typename CharT, typename Traits = std::char_traits<CharT>>
 class m_basic_string {
 public:
@@ -13,7 +40,7 @@ public:
 	class string_rep {
 
 		friend class m_basic_string;
-		class color;
+		
 
 	public:
 		string_rep(void);
@@ -50,7 +77,6 @@ public:
 		};
 
 	private:
-		class color;
 
 		size_t len_;
 		CharT* str_;
@@ -59,22 +85,6 @@ public:
 
 		color& color_;
 
-		class color {
-			friend class string_rep;
-		private:
-			unsigned __int8 r_;
-			unsigned __int8 g_;
-			unsigned __int8 b_;
-		public:
-			static constexpr char rgb_sequence[]{ 0x1B,'[','3','8',';','5',';','\0' };
-			static constexpr char reset[]{ 0x1B,'[','0','m','\0' };
-
-			color(
-				unsigned __int8,
-				unsigned __int8,
-				unsigned __int8);
-			~color() = default;
-		};
 	};
 
 	class proxy
@@ -123,19 +133,14 @@ public:
 	m_basic_string tolower() const;
 	m_basic_string touppper() const;
 
-	friend std::basic_ostream<CharT>&
-		operator<<(std::basic_ostream<CharT>& os, const m_basic_string& str);
-
 
 	inline size_t len() const
 	{
 		return rep_->len();
 	};
 
-	class color;
-
 	inline const color& get_color() const {
-		return *(rep_->color_);
+		return rep_->color_;
 	}
 
 	inline const CharT* c_str() const
@@ -177,7 +182,8 @@ template <typename CharT>
 std::basic_ostream<CharT>&
 operator<<(std::basic_ostream<CharT>& os, const m_basic_string<CharT>& str)
 { 
-	return 
+	
+	return os << color::rgb_sequence << str.get_color().get_r() << ';' << str.get_color().get_g() << ';' << str.get_color().get_b() << 'm' << '\0' << color::reset;
 		
 };
 
@@ -506,6 +512,7 @@ string_rep::string_rep(void)
 	: len_(0)
 	, str_(new CharT[1])
 	, use_count_(1)
+	, color_(*(new color(192, 192, 192)))
 {
 	*str_ = '\0';
 };
@@ -517,6 +524,7 @@ string_rep::string_rep(const CharT c)
 	: len_(1)
 	, str_(new CharT[2])
 	, use_count_(1)
+	, color_(*(new color(192, 192, 192)))
 {
 	*str_ = c;
 	*(str_ + 1) = '\0';
@@ -529,6 +537,7 @@ string_rep::string_rep(size_t len, const CharT* s)
 	: len_(len)
 	, str_(new CharT[len_ + 1])
 	, use_count_(1)
+	, color_(*(new color(192, 192, 192)))
 {
 	Traits::copy(str_, s, len_ + 1);
 };
@@ -642,17 +651,15 @@ template <typename CharT, typename Traits>
 void m_basic_string<CharT, Traits>::
 string_rep::
 colorize(unsigned __int8 r, unsigned __int8 g, unsigned __int8 b) {
-	if (color != nullptr) {
+	
 		rep_ = rep_->get_own_copy();
-		delete color_;
-	}
-		color_ = new color(r, g, b);
+	
+	color_.r_ = r;
+	color_.g_ = g;
+	color_.b_ = b;
 };
 
-template <typename CharT, typename Traits>
-m_basic_string<CharT, Traits>::
-string_rep::color::
-color(
+color::color(
 	unsigned __int8 r,
 	unsigned __int8 g,
 	unsigned __int8 b)
