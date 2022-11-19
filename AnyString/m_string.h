@@ -13,50 +13,83 @@ public:
 	class string_rep {
 
 		friend class m_basic_string;
+		class color;
 
 	public:
 		string_rep(void);
 		string_rep(const CharT c);
-		string_rep(const CharT* s);
+		
+		string_rep(size_t len, const CharT* s);
 
 		string_rep(const string_rep&) = delete;
 		string_rep& operator=(const string_rep&) = delete;
 
 		~string_rep();
 
+		void colorize(unsigned __int8, unsigned __int8, unsigned __int8);
+
 		//pseudo-copying constructor
-		string_rep* get_copy();
+		string_rep* get_own_copy();
+
+		//	pseudo assignment
 		void assign(size_t len, const CharT* s);
 
 		inline size_t use_count() const
-		{return use_count_;};
+		{
+			return use_count_;
+		};
 
 		inline size_t len() const
-		{return len_;};
+		{
+			return len_;
+		};
 
 		inline CharT* str() const
-		{return str_;};
+		{
+			return str_;
+		};
 
 	private:
+		class color;
+
 		size_t len_;
 		CharT* str_;
 		size_t use_count_;
 		/*bool shareable_;*/
-	};
 
+		color& color_;
+
+		class color {
+			friend class string_rep;
+		private:
+			unsigned __int8 r_;
+			unsigned __int8 g_;
+			unsigned __int8 b_;
+		public:
+			static constexpr char rgb_sequence[]{ 0x1B,'[','3','8',';','5',';','\0' };
+			static constexpr char reset[]{ 0x1B,'[','0','m','\0' };
+
+			color(
+				unsigned __int8,
+				unsigned __int8,
+				unsigned __int8);
+			~color() = default;
+		};
+	};
 
 	class proxy
 	{
+		friend class m_basic_string;
 	public:
-		proxy(m_basic_string*, size_t pos);
-		inline ~proxy() {};
-
+		proxy(m_basic_string& s, size_t pos);
+		~proxy() = default;
+		
 		inline operator CharT() const;
-		proxy operator= (const CharT& value);
+		proxy& operator= (const CharT value);
 
 	private:
-		m_basic_string* b_str_;
-		size_t          pos_;
+		m_basic_string&       b_str_;
+		size_t                pos_;
 	};
 
 	//concatenation 
@@ -71,6 +104,7 @@ public:
 	//copy
 	m_basic_string(const m_basic_string& c);
 	m_basic_string& operator=(const m_basic_string& s)&;
+	m_basic_string& operator=(const char* ps)&;
 
 	~m_basic_string();
 
@@ -81,14 +115,28 @@ public:
 	CharT operator[](size_t i) const;
 
 	void check(size_t i) const;
+	void write(size_t i, CharT c);
+	CharT read(size_t i) const;
+
+	void colorize(unsigned __int8, unsigned __int8, unsigned __int8);
 
 	m_basic_string tolower() const;
 	m_basic_string touppper() const;
+
+	friend std::basic_ostream<CharT>&
+		operator<<(std::basic_ostream<CharT>& os, const m_basic_string& str);
+
 
 	inline size_t len() const
 	{
 		return rep_->len();
 	};
+
+	class color;
+
+	inline const color& get_color() const {
+		return *(rep_->color_);
+	}
 
 	inline const CharT* c_str() const
 	{
@@ -125,11 +173,12 @@ private:
 	string_rep* rep_;
 };
 
-template <typename C>
-std::basic_ostream<C>&
-operator<<(std::basic_ostream<C>& os, const m_basic_string<C>& str)
-{
-	return os << str.c_str();
+template <typename CharT>
+std::basic_ostream<CharT>&
+operator<<(std::basic_ostream<CharT>& os, const m_basic_string<CharT>& str)
+{ 
+	return 
+		
 };
 
 template <typename C>
@@ -300,7 +349,7 @@ m_basic_string(const CharT* const l, const CharT* const r)
 	Traits::copy(res + l_len, r, r_len + 1);
 
 	delete rep_;
-	rep_ = new string_rep(res);
+	rep_ = new string_rep(total_len,res);
 };
 
 //default constructor
@@ -326,7 +375,7 @@ m_basic_string<CharT, Traits>::~m_basic_string()
 //converting constructor for c-style strings 
 template <typename CharT, typename Traits>
 m_basic_string<CharT, Traits>::m_basic_string(const CharT* const s)
-	: rep_(new string_rep(s))
+	: rep_(new string_rep(Traits::length(s), s))
 {};
 
 //converting constructor for std::basic_string<CharT>
@@ -342,7 +391,8 @@ m_basic_string<CharT, Traits>::
 m_basic_string(const m_basic_string& c)
 	: m_basic_string()
 {
-	rep_ = c.rep_->get_copy();
+	++c.rep_->use_count_;
+	rep_ = c.rep_;
 };
 
 //copy assignment
@@ -375,7 +425,7 @@ operator+=(const m_basic_string& s)&
 	Traits::copy(s_res, rep_->str_, curr_len);
 	Traits::copy(s_res + curr_len, s.rep_->str_, add_len + 1);
 
-	string_rep* res(new string_rep(s_res));
+	string_rep* res(new string_rep(total_len, s_res));
 
 	if (--rep_->use_count_ == 0)
 		delete rep_;
@@ -391,7 +441,8 @@ typename m_basic_string<CharT, Traits>::proxy
 m_basic_string<CharT, Traits>::
 operator[](size_t i)
 {
-	return proxy(this, i);
+	check(i);
+	return proxy(*this, i);
 };
 
 //selector[]
@@ -399,9 +450,7 @@ template <typename CharT, typename Traits>
 CharT m_basic_string<CharT, Traits>::
 operator[](size_t i) const 
 {
-	if (i > len())
-		throw bad_index();
-
+	check(i);
 	return *(rep_->str_ + i);
 };
 
@@ -446,7 +495,6 @@ touppper() const
 	return m_basic_string(buffer);
 }
 
-
 /*
 *	string_rep
 */
@@ -477,8 +525,8 @@ string_rep::string_rep(const CharT c)
 //converting constructor for c-style strings
 template <typename CharT, typename Traits>
 m_basic_string<CharT, Traits>::
-string_rep::string_rep(const CharT* s)
-	: len_(Traits::length(s))
+string_rep::string_rep(size_t len, const CharT* s)
+	: len_(len)
 	, str_(new CharT[len_ + 1])
 	, use_count_(1)
 {
@@ -492,49 +540,13 @@ string_rep::~string_rep()
 	delete str_;
 };
 
-template <typename CharT, typename Traits>
-typename m_basic_string<CharT, Traits>::string_rep*
-m_basic_string<CharT, Traits>::
-string_rep::get_copy()
-{
-	++use_count_;
-	return this;
-};
-
-//string_rep(const string_rep* rep)
-//	: len_(rep->len())
-//	, str_(str_->c_str())
-//	, use_count_(++rep->use_count())
-//{};
-
-//pseudo-ajssignment
-template <typename CharT, typename Traits>
-void m_basic_string<CharT, Traits>::
-string_rep::assign(size_t len, const CharT* s)
-{
-	if (s == nullptr)
-		throw bad_pointer();
-
-	CharT* res = new CharT[len + 1];
-	Traits::copy(res, s, len + 1);
-
-	len_ = len;
-	use_count_ = 1;
-	str_ = res;
-
-	/*if (this->use_count_ == 1)
-		delete this;
-	else
-		--this->use_count_;*/
-};
-
 /*
 *	proxy
 */
 
 template <typename CharT, typename Traits>
 m_basic_string<CharT, Traits>::proxy::
-proxy(m_basic_string* s, size_t pos)
+proxy(m_basic_string& s, size_t pos)
 	: b_str_(s)
 	, pos_(pos)
 {};
@@ -543,34 +555,106 @@ template <typename CharT, typename Traits>
 inline m_basic_string<CharT, Traits>::proxy::
 operator CharT() const
 {
-	if (pos_ > b_str_->rep_->len())
-		throw bad_index();
-
-	return *(b_str_->rep_->str_ + pos_);
+	return b_str_.read(pos_);
 };
 
 template <typename CharT, typename Traits>
-typename m_basic_string<CharT, Traits>::proxy
+typename m_basic_string<CharT, Traits>::proxy&
 m_basic_string<CharT, Traits>::
-proxy::operator=(const CharT& value)
+proxy::operator=(const CharT c)
 {
-if (pos_ > b_str_->rep_->len())
-		throw bad_index();
-
-	if (b_str_->rep_->use_count() == 1)
-		*(b_str_->rep_->str() + pos_) = value;
-
-	if (--b_str_->rep_->use_count_ >= 1)
-	{
-		size_t len = b_str_->rep_->len();
-		CharT* res = new CharT[len + 1];
-		Traits::copy(res, b_str_->rep_->str_, len + 1);
-		*(res + pos_) = value;
-
-		b_str_->rep_ = new string_rep(res);
-
-	}
-
+	b_str_.write(pos_, c);
 	return *this;
 };
 
+template <typename CharT, typename Traits>
+void m_basic_string<CharT, Traits>::
+write(size_t i, CharT c)
+{
+	rep_ = rep_->get_own_copy();
+	rep_->str_[i] = c;
+
+	return;
+}
+
+template <typename CharT, typename Traits>
+CharT m_basic_string<CharT, Traits>::
+read(size_t i) const
+{
+	return rep_->str_[i];
+}
+
+template <typename CharT, typename Traits>
+typename m_basic_string<CharT, Traits>::string_rep*
+m_basic_string<CharT, Traits>::string_rep::
+get_own_copy()
+{
+	if (use_count_ == 1)
+		return this;
+	use_count_--;
+	return new string_rep(len_, str_);
+}
+
+template <typename CharT, typename Traits>
+void m_basic_string<CharT, Traits>::
+string_rep::assign(size_t len, const CharT* ps)
+{
+	if (ps == 0)
+		throw bad_pointer();
+	if (len_ != len)
+	{
+		delete[] str_;
+		len_ = len;
+		str_ = new char[len_ + 1];
+	}
+	Traits::copy(str_, ps, len_ + 1);
+	return;
+}
+
+template <typename CharT, typename Traits>
+m_basic_string<CharT, Traits>&
+m_basic_string<CharT, Traits>::
+operator=(const char* ps) &
+{
+	if (ps == 0)
+		throw bad_pointer();
+	if (rep_->use_count_ == 1)
+		rep_->assign(Traits::length(ps), ps);
+	else
+	{
+		rep_->use_count_--;	
+		rep_ = new string_rep(Traits::length(ps), ps);
+	}
+	return *this;
+}
+
+template <typename CharT, typename Traits>
+void m_basic_string<CharT, Traits>::
+colorize(
+	unsigned __int8 r,
+	unsigned __int8 g,
+	unsigned __int8 b) {
+	
+	rep_->colorize(r, g, b);
+}
+
+template <typename CharT, typename Traits>
+void m_basic_string<CharT, Traits>::
+string_rep::
+colorize(unsigned __int8 r, unsigned __int8 g, unsigned __int8 b) {
+	if (color != nullptr) {
+		rep_ = rep_->get_own_copy();
+		delete color_;
+	}
+		color_ = new color(r, g, b);
+};
+
+template <typename CharT, typename Traits>
+m_basic_string<CharT, Traits>::
+string_rep::color::
+color(
+	unsigned __int8 r,
+	unsigned __int8 g,
+	unsigned __int8 b)
+	: r_(r), g_(g), b_(b)
+{};

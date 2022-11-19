@@ -199,8 +199,19 @@ std::string delimeter(const char* str) {
 std::ostream& highlight(std::ostream& os)
 {
 	static const char begin_sequence[]{ 0x1B,'[','\0' };
+
+	static const char italics[]{ 0x1B,'[','3','m','\0'};
+	static const char bold[]{ 0x1B,'[','1','m','\0' };
+
+	/*ESC[38; 2; {r}; {g}; {b}m*/
+
+	static const char rgb_sequence[]{ 0x1B,'[','3','8',';','5',';','5','0',';','1','6','3',';','2','0','1','m' ,'\0' };
+
 	static const char reset[]{ 0x1B,'[','0','m','\0' };
-	return os << begin_sequence << 91 << ';' << 82 << 'm' << ++delim_count << reset;
+
+	__int8 value = 2;
+	/*return os << begin_sequence << 91 << ';' << 82 << 'm' << ++delim_count << reset;*/
+	return os << rgb_sequence << ++delim_count << reset;
 }
 
 //void ColorPrint(const char* text, int fg_color, int bg_color)
