@@ -20,7 +20,20 @@ std::string delimeter(const char* str);
 
 //work with for each???
 
-int main(void) {	
+int main(void) {
+
+	{
+		
+		m_string foo1 = foo1;
+
+		foo1 = foo1;	
+	}
+
+	{
+		std::cout << delimeter("pre");
+		std::string foo1 = foo1;
+		std::cout << res_is << foo1;
+	}
 
 	{		
 		std::cout << delimeter("default ");

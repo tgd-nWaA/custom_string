@@ -80,6 +80,8 @@ public:
 
 	CharT operator[](size_t i) const;
 
+	void check(size_t i) const;
+
 	m_basic_string tolower() const;
 	m_basic_string touppper() const;
 
@@ -305,21 +307,13 @@ m_basic_string(const CharT* const l, const CharT* const r)
 template <typename CharT, typename Traits>
 m_basic_string<CharT, Traits>::m_basic_string(void)
 	: rep_(new string_rep())
-{
-	#ifndef NDEBUG
-	std::cout << "default constructor" << "\n";
-	#endif
-};
+{};
 
 //converting constructor for CharT
 template <typename CharT, typename Traits>
 m_basic_string<CharT, Traits>::m_basic_string(const CharT c)
 	: rep_(new string_rep(c))
-{
-	#ifndef NDEBUG
-	std::cout << "converting constructor for CharT" << "\n";
-	#endif
-};
+{};
 
 //converting constructor for CharT
 template <typename CharT, typename Traits>
@@ -327,32 +321,20 @@ m_basic_string<CharT, Traits>::~m_basic_string()
 {
 	if (--rep_->use_count_ == 0)
 		delete rep_;
-
-	#ifndef NDEBUG
-	std::cout << "destructor" << "\n";
-	#endif  
 };
 
 //converting constructor for c-style strings 
 template <typename CharT, typename Traits>
 m_basic_string<CharT, Traits>::m_basic_string(const CharT* const s)
 	: rep_(new string_rep(s))
-{
-	#ifndef NDEBUG
-	std::cout << "converting constructor for c-style strings " << "\n";
-	#endif  
-};
+{};
 
 //converting constructor for std::basic_string<CharT>
 template <typename CharT, typename Traits>
 m_basic_string<CharT, Traits>::
 m_basic_string(std::basic_string<CharT>& s)
 	: m_basic_string(s.c_str())
-{
-	#ifndef NDEBUG
-	std::cout << "converting constructor for std::basic_string<CharT>" << "\n";
-	#endif  
-};
+{};
 
 //copy constructor
 template <typename CharT, typename Traits>
@@ -361,9 +343,6 @@ m_basic_string(const m_basic_string& c)
 	: m_basic_string()
 {
 	rep_ = c.rep_->get_copy();
-	#ifndef NDEBUG
-	std::cout << "copy constructor" << "\n";
-	#endif    
 };
 
 //copy assignment
@@ -380,10 +359,6 @@ operator=(const m_basic_string& s)&
 	rep_ = s.rep_;
 
 	return *this;
-
-	#ifndef NDEBUG
-	std::cout << "copy assignment" << "\n";
-	#endif    
 };
 
 //operator +=
@@ -408,10 +383,6 @@ operator+=(const m_basic_string& s)&
 	rep_ = res;
 
 	return *this;
-
-#ifndef NDEBUG
-	std::cout << "move assignment" << "\n";
-#endif    
 };
 
 //modifier[]
@@ -421,10 +392,6 @@ m_basic_string<CharT, Traits>::
 operator[](size_t i)
 {
 	return proxy(this, i);
-
-#ifndef NDEBUG
-	std::cout << "move assignment" << "\n";
-#endif    
 };
 
 //selector[]
@@ -436,11 +403,20 @@ operator[](size_t i) const
 		throw bad_index();
 
 	return *(rep_->str_ + i);
-
-	#ifndef NDEBUG
-	std::cout << "move assignment" << "\n";
-	#endif    
 };
+
+template <typename CharT, typename Traits>
+void m_basic_string<CharT, Traits>::
+check(size_t i) const
+{
+	//	check if the index is within of the range
+	if (i < 0 || rep_->len_ <= i)
+	{
+		throw bad_index();
+	}
+
+	return;
+}
 
 template <typename CharT, typename Traits>
 m_basic_string<CharT, Traits>
