@@ -141,7 +141,6 @@ int main(void) {
 		std::cout << res_is << (foo1 > foo2) << "\n";
 		std::cout << res_is << (foo1 < foo2) << "\n";
 
-		foo1 == &('s');
 
 		foo1 == "hjfkdsk";
 		"gfjkl" == foo1;
@@ -169,6 +168,7 @@ int main(void) {
 		m_string s("Tra-ta-ta");
 		const char* ps = static_cast<const char*> (s);
 		std::cout << res_is << (s += ps) << ';' << std::endl;
+
 	}
 
 	return 0;
@@ -183,19 +183,13 @@ std::string delimeter(const char* str) {
 
 std::ostream& highlight(std::ostream& os)
 {
-	static const char begin_sequence[]{ 0x1B,'[','\0' };
-
 	static const char italics[]{ 0x1B,'[','3','m','\0'};
 	static const char bold[]{ 0x1B,'[','1','m','\0' };
 
-	/*ESC[38; 2; {r}; {g}; {b}m*/
+	static constexpr char rgb_sequence[]{ 0x1B,'[','3','8',';','2',';','\0' };
+	static const char reset[]{ 0x1B,'[','0','m','\0' };	
 
-	static const char rgb_sequence[]{ 0x1B,'[','3','8',';','5',';','5','0',';','1','6','3',';','2','0','1','m' ,'\0' };
-
-	static const char reset[]{ 0x1B,'[','0','m','\0' };
-
-	__int8 value = 2;
 	/*return os << begin_sequence << 91 << ';' << 82 << 'm' << ++delim_count << reset;*/
-	return os << rgb_sequence << ++delim_count << reset;
+	return os << rgb_sequence << 244 << ';' << 187 << ';' << 68 << 'm' << ++delim_count << reset;
 }
 
