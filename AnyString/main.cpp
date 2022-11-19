@@ -141,6 +141,8 @@ int main(void) {
 		std::cout << res_is << (foo1 > foo2) << "\n";
 		std::cout << res_is << (foo1 < foo2) << "\n";
 
+		foo1 == &('s');
+
 		foo1 == "hjfkdsk";
 		"gfjkl" == foo1;
 
@@ -197,24 +199,3 @@ std::ostream& highlight(std::ostream& os)
 	return os << rgb_sequence << ++delim_count << reset;
 }
 
-//void ColorPrint(const char* text, int fg_color, int bg_color)
-//{
-//	static const char begin_sequence[]{ 0x1B,'[','\0' };
-//	static const char reset[]{ 0x1B,'[','0','m','\0' };
-//
-//	std::cout << begin_sequence << fg_color << ';' << bg_color << 'm' << text << reset << "\n";
-//}
-
-/*std::cout << highlight;*/
-/*std::cout << bold_on << "bold" << bold_off << " non-bold" << std::endl;*/
-
-//std::ostream& bold_on(std::ostream& os)
-//{
-//	static const char begin_sequence[]{ 0x1B,'[','\0' };
-//	return os << "ESC[<1> m";
-//}
-//
-//std::ostream& bold_off(std::ostream& os)
-//{
-//	return os << "ESC[<22> m";
-//}

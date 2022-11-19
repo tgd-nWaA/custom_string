@@ -3,9 +3,6 @@
 
 #include <string>
 
-//TODO
-#include <iostream>
-
 class Color;
 
 class bad_index : std::exception {};
