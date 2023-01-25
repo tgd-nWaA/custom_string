@@ -1,1 +1,1 @@
-NaUKMA task | Custom string class in c++ 
+NaUKMA | Custom string class in c++ 
