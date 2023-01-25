@@ -1,2 +1,1 @@
-# _NaUKMA_moop_CustomString
-Developing custom string class in c++ for NaUKMA moop 
+NaUKMA task | Custom string class in c++ 
